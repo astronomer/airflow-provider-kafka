@@ -7,7 +7,12 @@ from airflow.hooks.base import BaseHook
 
 
 
-
+def client_required(method):
+    def inner(ref,*args,**kwargs):
+        if not ref.admin_client:
+            ref.get_admin_client()
+        return method(ref,*args,**kwargs)
+    return inner
 
 class ConsumerHook(BaseHook):
     """
@@ -27,8 +32,12 @@ class ConsumerHook(BaseHook):
         self.kafka_conn_id = kafka_conn_id
         self.config = config
         self.topics = topics
+        self.consumer = None
 
-        if (not config.get('bootstrap.servers',None) or self.kafka_conn_id ) or (config.get('bootstrap.servers',None) and self.kafka_conn_id) :
+        if not (config.get('bootstrap.servers',None) or self.kafka_conn_id ):
+            raise AirflowException(f"One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
+
+        if config.get('bootstrap.servers',None) and self.kafka_conn_id :
             raise AirflowException(f"One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
         
 

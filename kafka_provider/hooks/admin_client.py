@@ -6,11 +6,9 @@ from confluent_kafka.admin import AdminClient, NewTopic
 from airflow.exceptions import AirflowException
 from airflow.hooks.base import BaseHook
 
-import functools
 
 
 def client_required(method):
-    # @functools.wraps(inner)
     def inner(ref,*args,**kwargs):
         if not ref.admin_client:
             ref.get_admin_client()
