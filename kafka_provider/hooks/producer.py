@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional,
+from typing import Any, Dict, Optional
 
 from confluent_kafka import Producer
 
@@ -31,7 +31,7 @@ class ProducerHook(BaseHook):
         
 
 
-    def get_producer(self) -> Producer:
+    def get_producer(self) -> None:
         """
         Returns http session to use with requests.
 

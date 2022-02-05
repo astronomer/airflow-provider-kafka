@@ -67,7 +67,6 @@ class TestSampleHook(unittest.TestCase):
         assert isinstance(h.admin_client,AdminClient)
 
         
-    
     def test_create_topic(self):
         """ test topic creation """
         extra_configs = {'socket.timeout.ms': 10}

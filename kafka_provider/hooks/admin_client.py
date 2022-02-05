@@ -42,7 +42,7 @@ class AdminClientHook(BaseHook):
         
 
 
-    def get_admin_client(self) -> AdminClient:
+    def get_admin_client(self) -> None:
         """
         Returns http session to use with requests.
 
@@ -55,7 +55,7 @@ class AdminClientHook(BaseHook):
             extra_configs = {'bootstrap.servers':conn}
     
         self.admin_client = AdminClient({**self.config,**extra_configs})
-        return self.admin_client
+        return
 
 
     @client_required
