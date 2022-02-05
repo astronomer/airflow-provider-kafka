@@ -21,8 +21,12 @@ class ProducerHook(BaseHook):
 
         self.kafka_conn_id = kafka_conn_id
         self.config = config
+        self.producer = None
 
-        if (not config.get('bootstrap.servers',None) or self.kafka_conn_id ) or (config.get('bootstrap.servers',None) and self.kafka_conn_id) :
+        if not (config.get('bootstrap.servers',None) or self.kafka_conn_id ):
+            raise AirflowException(f"One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
+
+        if config.get('bootstrap.servers',None) and self.kafka_conn_id :
             raise AirflowException(f"One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
         
 
@@ -39,4 +43,5 @@ class ProducerHook(BaseHook):
             conn = self.get_connection(self.kafka_conn_id)
             extra_configs = {'bootstrap.servers':conn}
         
-        return Producer({**extra_configs,**self.config})
+        self.producer =  Producer({**extra_configs,**self.config})
+        return
