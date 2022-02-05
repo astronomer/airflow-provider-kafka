@@ -1,6 +1,6 @@
-from typing import Any, Dict, Optional,
+from typing import Any, Dict, Optional, List
 
-from confluent_kafka.admin import Consumer
+from confluent_kafka import Consumer
 
 from airflow.exceptions import AirflowException
 from airflow.hooks.base import BaseHook
@@ -9,8 +9,8 @@ from airflow.hooks.base import BaseHook
 
 def client_required(method):
     def inner(ref,*args,**kwargs):
-        if not ref.admin_client:
-            ref.get_admin_client()
+        if not ref.consumer:
+            ref.get_consumer()
         return method(ref,*args,**kwargs)
     return inner
 
@@ -42,7 +42,7 @@ class ConsumerHook(BaseHook):
         
 
 
-    def get_consumer(self) -> KafkaProducer:
+    def get_consumer(self) -> None:
         """
         Returns http session to use with requests.
 
@@ -57,7 +57,8 @@ class ConsumerHook(BaseHook):
         consumer = Consumer({**extra_configs,**self.config})
         consumer.subscribe(topics)
 
-        return consumer
+        self.consumer = consumer
+        return
 
 
 
