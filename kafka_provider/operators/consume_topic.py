@@ -22,11 +22,11 @@ class ConsumeTopic(BaseOperator):
         apply_function: Callable,
         connection_id: Optional[str] = None,
         consumer_config: Optional[Dict[Any,Any]] = None,
-        commit_cadence: Optional = 'end_of_operator',
+        commit_cadence: Optional[str] = 'end_of_operator',
         max_messages: Optional[int] = None,
-        max_batch_size: int = 1000
+        max_batch_size: int = 1000,
         **kwargs: Any
-    ) -> None:
+        ) -> None:
         super().__init__(**kwargs)
         
         self.topics = topics
@@ -49,7 +49,6 @@ class ConsumeTopic(BaseOperator):
     def execute(self) -> Any:
 
         consumer = ConsumerHook(topics = self.topics, kafka_conn_id=self.connection_id, config=self.config).get_consumer()
-        consumer.subscribe(self.topics)
         
         messages_left = self.max_messages
         messages_processed = 0
@@ -62,7 +61,7 @@ class ConsumeTopic(BaseOperator):
                 batch_size = self.max_batch_size
             
             msgs = consumer.consume(num_messages = batch_size, timeout=60)
-            message_left -= len(msgs)
+            messages_left -= len(msgs)
             messages_processed += len(msgs)
 
             if not msgs : #No messages + messages_left is being used.

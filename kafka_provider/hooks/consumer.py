@@ -47,10 +47,7 @@ class ConsumerHook(BaseHook):
 
     def get_consumer(self) -> None:
         """
-        Returns http session to use with requests.
-
-        :param headers: additional headers to be passed through as a dictionary
-        :type headers: dict
+        Returns a Consumer that has been subscribed to topics.
         """
         extra_configs = {}
         if self.kafka_conn_id:
@@ -58,10 +55,10 @@ class ConsumerHook(BaseHook):
             extra_configs = {'bootstrap.servers':conn}
         
         consumer = Consumer({**extra_configs,**self.config})
-        consumer.subscribe(topics)
+        consumer.subscribe(self.topics)
 
         self.consumer = consumer
-        return
+        return self.consumer
 
 
 
