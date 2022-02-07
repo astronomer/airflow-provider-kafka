@@ -34,13 +34,16 @@ class ConsumerHook(BaseHook):
         self.topics = topics
         self.consumer = None
 
-        if not (config.get('bootstrap.servers',None) or self.kafka_conn_id ):
-            raise AirflowException(f"One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
-
-        if config.get('bootstrap.servers',None) and self.kafka_conn_id :
-            raise AirflowException(f"One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
         
+        if not self.config.get('group.id',None):
+            raise AirflowException("The 'group.id' parameter must be set in the config dictionary'. Got <None>")
+ 
+        if not (self.config.get('bootstrap.servers',None) or self.kafka_conn_id ):
+            raise AirflowException(f"One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
 
+        if self.config.get('bootstrap.servers',None) and self.kafka_conn_id :
+            raise AirflowException(f"One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
+ 
 
     def get_consumer(self) -> None:
         """

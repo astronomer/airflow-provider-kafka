@@ -39,15 +39,19 @@ class TestConsumerHook(unittest.TestCase):
         ''' test initialization of AdminClientHook'''
 
         #Standard Init
-        extra_configs = {'socket.timeout.ms': 10}
+        extra_configs = {'socket.timeout.ms': 10, 'group.id' : 'test'}
         c = ConsumerHook(['test_1'], kafka_conn_id='kafka_samle', config=extra_configs)
         
         #Too Many Args
         with pytest.raises(AirflowException):
-            extra_configs = {'bootstrap.servers': 'localhost:9092'}
+            extra_configs = {'bootstrap.servers': 'localhost:9092', 'group.id' : 'test2'}
             c = ConsumerHook(['test_1'], kafka_conn_id='kafka_samle', config=extra_configs)
             
         #Not Enough Args
+        with pytest.raises(AirflowException):
+            extra_configs = {'group.id':'test3'}
+            c = ConsumerHook(['test_1'], config=extra_configs)
+        
         with pytest.raises(AirflowException):
             extra_configs = {}
             c = ConsumerHook(['test_1'], config=extra_configs)
