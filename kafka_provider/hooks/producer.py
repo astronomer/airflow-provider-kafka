@@ -5,6 +5,8 @@ from confluent_kafka import Producer
 from airflow.exceptions import AirflowException
 from airflow.hooks.base import BaseHook
 
+
+
 class ProducerHook(BaseHook):
     """
     A hook to create a Kafka Producer
@@ -38,6 +40,7 @@ class ProducerHook(BaseHook):
         :param headers: additional headers to be passed through as a dictionary
         :type headers: dict
         """
+
         extra_configs = {}
         if self.kafka_conn_id:
             conn = self.get_connection(self.kafka_conn_id)

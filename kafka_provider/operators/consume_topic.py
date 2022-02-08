@@ -46,7 +46,7 @@ class ConsumeTopic(BaseOperator):
         if self.commit_cadence == 'never':
             self.commit_cadence = None
         
-    def execute(self) -> Any:
+    def execute(self, context) -> Any:
 
         consumer = ConsumerHook(topics = self.topics, kafka_conn_id=self.connection_id, config=self.config).get_consumer()
         

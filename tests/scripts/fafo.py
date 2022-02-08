@@ -10,12 +10,11 @@ def acked(err, msg):
         """Delivery report handler called on
         successful or failed delivery of message
         """
-        pass
-        # if err is not None:
-        #     print("Failed to deliver message: {}".format(err))
-        # else:
-        #     print("Produced record to topic {} partition [{}] @ offset {}"
-        #           .format(msg.topic(), msg.partition(), msg.offset()))
+        if err is not None:
+            print("Failed to deliver message: {}".format(err))
+        else:
+            print("Produced record to topic {} partition [{}] @ offset {}"
+                  .format(msg.topic(), msg.partition(), msg.offset()))
 
 
 TOPICS = ["numbers_1","numbers_2"]
@@ -62,16 +61,16 @@ consumer = Consumer({**config, **extra_config})
 consumer.subscribe(["numbers_1"])
 
 msgs = consumer.consume(num_messages = 100, timeout=60)
-# print(msgs)
-# for m in msgs:
-#     try:
-#         print(m.topic(), 
-#               m.partition(), 
-#               m.key(), 
-#               json.loads(m.value())
-#               )
-#     except Exception as e:
-#         print(f"{ e }")
+print(msgs)
+for m in msgs:
+    try:
+        x = (m.topic(), 
+              m.partition(), 
+              m.key(), 
+              json.loads(m.value())
+              )
+    except Exception as e:
+        print(f"{ e }")
 
 consumer.commit()
 consumer.close()
@@ -85,16 +84,14 @@ extra_config = {
 consumer2 = Consumer({**config, **extra_config})
 consumer2.subscribe(['^.*$'])
 msgs = consumer2.consume(num_messages = 1000, timeout=60)
-# for m in msgs:
-#     try:
-#         no_op = (m.topic(), 
-#               m.partition(), 
-#               m.key(), 
-#               json.loads(m.value()))
-#         print(no_op)
-              
-#     except Exception as e:
-#         print(f"{ e }")
+for m in msgs:
+    try:
+        no_op = (m.topic(), 
+              m.partition(), 
+              m.key(), 
+              json.loads(m.value()))          
+    except Exception as e:
+        print(f"{ e }")
 
 consumer2.commit()
 consumer2.close()
