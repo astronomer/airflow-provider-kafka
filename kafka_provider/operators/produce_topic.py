@@ -19,8 +19,8 @@ class ProduceTopic(BaseOperator):
         self,
         *,
         topic: str,
-        producer_function: Callable[Any],
-        delivery_callback: Optional[Callable[Any]] = None,
+        producer_function: Callable[...],
+        delivery_callback: Optional[Callable[...]] = None,
         kafka_conn_id: Optional[str] = None,
         config: Optional[Dict[Any,Any]] = None,
         **kwargs: Any
