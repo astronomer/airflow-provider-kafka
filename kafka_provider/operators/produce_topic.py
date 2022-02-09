@@ -20,8 +20,9 @@ class ProduceTopic(BaseOperator):
         *,
         topic: str,
         producer_function: Callable[...],
-        delivery_callback: Optional[Callable[...]] = None,
+        delivery_callback: Optional[Callable[Any]] = None,
         kafka_conn_id: Optional[str] = None,
+        syncronous: Optional[bool] = True,
         config: Optional[Dict[Any,Any]] = None,
         **kwargs: Any
         ) -> None:
@@ -31,7 +32,8 @@ class ProduceTopic(BaseOperator):
         self.config = config
         self.topic = topic
         self.producer_function = producer_function
-        self.delivery_callback = delivery_callback
+        self.delivery_callback = delivery_callback or (lambda *args, **kwargs: None)
+        self.syncronous = syncronous
         
     def execute(self) -> Any:
 
@@ -39,8 +41,13 @@ class ProduceTopic(BaseOperator):
 
         for k,v in self.producer_function():
             producer.produce(self.topic, key=k, value=v, on_delivery=self.delivery_callback)
-            producer.flush() # We're going full sync production here.
+            
+            if self.syncronous:
+                producer.flush() 
+            else:
+                producer.poll(0)
         
-        producer.flush() #Being safe
+        producer.flush() 
+        producer.close()
         
         pass
