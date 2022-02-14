@@ -42,13 +42,9 @@ class TestConsumerFromTopic(unittest.TestCase):
             poll_timeout=.0001
         )
 
-        # Airflow calls the operator's execute method at runtime with the task run's bespoke context dictionary
-        
-        with mock.patch
-        
+        #execute the operator (this is essentially a no op as the broker isn't setup)
         response_payload = operator.execute(context={})
-
-        print(response_payload)
+    
 
 
 if __name__ == '__main__':
