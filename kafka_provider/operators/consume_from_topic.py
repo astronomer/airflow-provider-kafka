@@ -11,7 +11,7 @@ from kafka_provider.shared_utils import get_callable
 
 VALID_COMMIT_CADENCE = {'never','end_of_batch','end_of_operator'}
 
-class ConsumeTopic(BaseOperator):
+class ConsumeFromTopic(BaseOperator):
 
     BLUE = '#ffefeb'
     ui_color = BLUE
@@ -23,7 +23,7 @@ class ConsumeTopic(BaseOperator):
         apply_function: str,
         apply_function_args: Optional[Sequence[Any]] = None,
         apply_function_kwargs: Optional[Dict[Any,Any]] = None,
-        connection_id: Optional[str] = None,
+        kafka_conn_id: Optional[str] = None,
         consumer_config: Optional[Dict[Any,Any]] = None,
         commit_cadence: Optional[str] = 'end_of_operator',
         max_messages: Optional[int] = None,
@@ -36,7 +36,7 @@ class ConsumeTopic(BaseOperator):
         self.apply_function = apply_function
         self.apply_function_args = apply_function_args or ()
         self.apply_function_kwargs = apply_function_kwargs or {}
-        self.connection_id = connection_id
+        self.kafka_conn_id = kafka_conn_id
         self.config = consumer_config or {}
         self.commit_cadence = commit_cadence
         self.max_messages = max_messages or True
