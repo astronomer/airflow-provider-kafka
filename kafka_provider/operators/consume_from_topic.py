@@ -1,12 +1,13 @@
 from email import message_from_string
 from typing import Any, Callable, Dict, Optional, Sequence
+from functools import partial
 
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
 from airflow.utils.decorators import apply_defaults
 
 from kafka_provider.hooks.consumer import ConsumerHook
-
+from kafka_provider.shared_utils import get_callable
 
 VALID_COMMIT_CADENCE = {'never','end_of_batch','end_of_operator'}
 
@@ -19,7 +20,9 @@ class ConsumeTopic(BaseOperator):
         self,
         *,
         topics: Sequence[str],
-        apply_function: Callable,
+        apply_function: str,
+        apply_function_args: Optional[Sequence[Any]] = None,
+        apply_function_kwargs: Optional[Dict[Any,Any]] = None,
         connection_id: Optional[str] = None,
         consumer_config: Optional[Dict[Any,Any]] = None,
         commit_cadence: Optional[str] = 'end_of_operator',
@@ -31,6 +34,8 @@ class ConsumeTopic(BaseOperator):
         
         self.topics = topics
         self.apply_function = apply_function
+        self.apply_function_args = apply_function_args or ()
+        self.apply_function_kwargs = apply_function_kwargs or {}
         self.connection_id = connection_id
         self.config = consumer_config or {}
         self.commit_cadence = commit_cadence
@@ -49,6 +54,8 @@ class ConsumeTopic(BaseOperator):
     def execute(self, context) -> Any:
 
         consumer = ConsumerHook(topics = self.topics, kafka_conn_id=self.connection_id, config=self.config).get_consumer()
+        apply_callable = get_callable(self.apply_function)
+        apply_callable = partial(apply_callable,*self.apply_function_args, **self.apply_function_kwargs)
         
         messages_left = self.max_messages
         messages_processed = 0
@@ -68,7 +75,7 @@ class ConsumeTopic(BaseOperator):
                 self.log.info("Reached end of log. Exiting.")
                 break
 
-            map(self.apply_function, msgs)
+            map(apply_callable, msgs)
             
             if self.commit_cadence == 'end_of_batch':
                 consumer.commit()
