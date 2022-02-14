@@ -17,7 +17,6 @@ class ProduceToTopic(BaseOperator):
 
     def __init__(
         self,
-        *,
         topic: str,
         producer_function: str,
         producer_function_args: Optional[Sequence[Any]] = None,
@@ -25,13 +24,13 @@ class ProduceToTopic(BaseOperator):
         delivery_callback: Optional[Callable[..., Dict[bytes,bytes]]] = None,
         kafka_conn_id: Optional[str] = None,
         syncronous: Optional[bool] = True,
-        config: Optional[Dict[Any,Any]] = None,
+        kafka_config: Optional[Dict[Any,Any]] = None,
         **kwargs: Any
         ) -> None:
         super().__init__(**kwargs)
         
         self.kafka_conn_id = kafka_conn_id
-        self.config = config
+        self.kafka_config = kafka_config
         self.topic = topic
         self.producer_function = producer_function
         self.producer_function_args = producer_function_args
@@ -42,7 +41,7 @@ class ProduceToTopic(BaseOperator):
     def execute(self) -> Any:
 
         # Get producer and callable
-        producer = ProducerHook(kafka_conn_id=self.kafka_conn_id, config = self.config).get_producer()
+        producer = ProducerHook(kafka_conn_id=self.kafka_conn_id, config = self.kafka_config).get_producer()
         producer_callable = get_callable(self.producer_function)
 
         # For each returned k/v in the callable : publish and flush if needed.

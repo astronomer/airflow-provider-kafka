@@ -18,7 +18,6 @@ class ConsumeFromTopic(BaseOperator):
 
     def __init__(
         self,
-        *,
         topics: Sequence[str],
         apply_function: str,
         apply_function_args: Optional[Sequence[Any]] = None,
