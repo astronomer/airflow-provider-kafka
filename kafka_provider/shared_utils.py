@@ -20,3 +20,6 @@ def get_callable(function_string: str) -> Callable:
 
 def no_op(*args,**kwargs):
     return args,kwargs
+
+def simple_producer(key,value):
+    return [ (key,  value) ]
