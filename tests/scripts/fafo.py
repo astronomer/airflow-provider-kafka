@@ -2,7 +2,7 @@ from distutils.command.config import config
 from socket import timeout
 from confluent_kafka.admin import AdminClient, NewTopic
 from confluent_kafka import Producer, Consumer
-from asgiref.sync import sync_to_async
+
 
 
 import json
@@ -37,10 +37,9 @@ for t,f in futures.items():
         f.result()
         print(f"Topic {t} created.")
     except Exception as e:
-        # if e.args[0].get('code',None) == 'TOPIC_ALREADY_EXISTS':
-        #     pass
+        if e.args[0].name() == 'TOPIC_ALREADY_EXISTS':
+            pass
         
-        print(e.args[0].name())
 
 
 
@@ -48,7 +47,8 @@ producer = Producer(config)
 
 for t in TOPICS:
     for x in range(1000):
-        producer.produce(t, key=f"{t}_{x}", value=json.dumps({"count":x}), on_delivery=acked)
+        producer.produce(t, key=json.dumps(f"{t}_{x}"), value=json.dumps({"count":x}), on_delivery=acked)
+        producer.poll(0)
     producer.flush()
 
 
@@ -66,34 +66,34 @@ msgs = consumer.consume(num_messages = 100, timeout=60)
 print(msgs)
 for m in msgs:
     try:
-        x = (m.topic(), 
-              m.partition(), 
+        x = (
               m.key(), 
-              json.loads(m.value())
+              m.value()
               )
+        print(x)
     except Exception as e:
         print(f"{ e }")
 
 consumer.commit()
 consumer.close()
 
-### multiple_topics
-extra_config = {
-    "group.id" : "foo2",
-    "enable.auto.commit":False,
-    "auto.offset.reset": "beginning"
-}
-consumer2 = Consumer({**config, **extra_config})
-consumer2.subscribe(['^.*$'])
-msgs = consumer2.consume(num_messages = 1000, timeout=60)
-for m in msgs:
-    try:
-        no_op = (m.topic(), 
-              m.partition(), 
-              m.key(), 
-              json.loads(m.value()))          
-    except Exception as e:
-        print(f"{ e }")
+# ### multiple_topics
+# extra_config = {
+#     "group.id" : "foo2",
+#     "enable.auto.commit":False,
+#     "auto.offset.reset": "beginning"
+# }
+# consumer2 = Consumer({**config, **extra_config})
+# consumer2.subscribe(['^.*$'])
+# msgs = consumer2.consume(num_messages = 1000, timeout=60)
+# for m in msgs:
+#     try:
+#         no_op = (m.topic(), 
+#               m.partition(), 
+#               m.key(), 
+#               json.loads(m.value()))          
+#     except Exception as e:
+#         print(f"{ e }")
 
-consumer2.commit()
-consumer2.close()
+# consumer2.commit()
+# consumer2.close()

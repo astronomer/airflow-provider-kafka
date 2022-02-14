@@ -1,4 +1,5 @@
 from typing import Any, Dict, Optional, List
+from xmlrpc.client import Boolean
 
 from confluent_kafka import Consumer
 
@@ -25,7 +26,8 @@ class ConsumerHook(BaseHook):
         self,
         topics:List[str],
         kafka_conn_id: Optional[str] = None,
-        config: Optional[Dict[Any,Any]] = None
+        config: Optional[Dict[Any,Any]] = None,
+        no_broker: Optional[bool] = False
     ) -> None:
         super().__init__()
 
@@ -33,13 +35,15 @@ class ConsumerHook(BaseHook):
         self.config = config
         self.topics = topics
         self.consumer = None
+        self.no_broker = no_broker
 
         
-        if not self.config.get('group.id',None):
-            raise AirflowException("The 'group.id' parameter must be set in the config dictionary'. Got <None>")
- 
-        if not (self.config.get('bootstrap.servers',None) or self.kafka_conn_id ):
-            raise AirflowException(f"One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
+        if not self.no_broker:
+            if not self.config.get('group.id',None):
+                raise AirflowException("The 'group.id' parameter must be set in the config dictionary'. Got <None>")
+    
+            if not (self.config.get('bootstrap.servers',None) or self.kafka_conn_id ):
+                raise AirflowException(f"One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
 
         if self.config.get('bootstrap.servers',None) and self.kafka_conn_id :
             raise AirflowException(f"One of config['bootsrap.servers'] or kafka_conn_id must be provided.")

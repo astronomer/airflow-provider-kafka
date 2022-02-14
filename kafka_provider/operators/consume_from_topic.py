@@ -28,6 +28,8 @@ class ConsumeFromTopic(BaseOperator):
         commit_cadence: Optional[str] = 'end_of_operator',
         max_messages: Optional[int] = None,
         max_batch_size: int = 1000,
+        no_broker: Optional[bool] = False,
+        poll_timeout: Optional[float] = 60,
         **kwargs: Any
         ) -> None:
         super().__init__(**kwargs)
@@ -41,6 +43,8 @@ class ConsumeFromTopic(BaseOperator):
         self.commit_cadence = commit_cadence
         self.max_messages = max_messages or True
         self.max_batch_size = max_batch_size
+        self.no_broker = no_broker
+        self.poll_timeout = poll_timeout
         
         if self.commit_cadence not in VALID_COMMIT_CADENCE:
             raise AirflowException(f"commit_cadence must be one of {VALID_COMMIT_CADENCE}. Got {self.commit_cadence}")
@@ -53,7 +57,7 @@ class ConsumeFromTopic(BaseOperator):
         
     def execute(self, context) -> Any:
 
-        consumer = ConsumerHook(topics = self.topics, kafka_conn_id=self.connection_id, config=self.config).get_consumer()
+        consumer = ConsumerHook(topics = self.topics, kafka_conn_id=self.kafka_conn_id, config=self.config, no_broker=self.no_broker).get_consumer()
         apply_callable = get_callable(self.apply_function)
         apply_callable = partial(apply_callable,*self.apply_function_args, **self.apply_function_kwargs)
         
@@ -67,7 +71,7 @@ class ConsumeFromTopic(BaseOperator):
             else:
                 batch_size = self.max_batch_size
             
-            msgs = consumer.consume(num_messages = batch_size, timeout=60)
+            msgs = consumer.consume(num_messages = batch_size, timeout=self.poll_timeout)
             messages_left -= len(msgs)
             messages_processed += len(msgs)
 
