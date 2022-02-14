@@ -26,9 +26,9 @@ log = logging.getLogger(__name__)
 
 # Mock the `conn_sample` Airflow connection
 @mock.patch.dict('os.environ', AIRFLOW_CONN_KAFKA_SAMPLE='localhost:9092')
-class TestConsumerFromTopic(unittest.TestCase):
+class TestConsumeFromTopic(unittest.TestCase):
     """
-    Test Sample Operator.
+    Test ConsumeFromTopic
     """
 
     def test_operator(self):
@@ -44,7 +44,7 @@ class TestConsumerFromTopic(unittest.TestCase):
 
         #execute the operator (this is essentially a no op as the broker isn't setup)
         response_payload = operator.execute(context={})
-    
+
 
 
 if __name__ == '__main__':
