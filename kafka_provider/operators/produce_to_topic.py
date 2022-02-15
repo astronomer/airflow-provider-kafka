@@ -40,7 +40,8 @@ class ProduceToTopic(BaseOperator):
 
         if not (self.topic and self.producer_function):
             raise AirflowException(
-                f"topic and producer_function must be provided. Got topic={self.topic} and producer_function={self.producer_function}"
+                "topic and producer_function must be provided. Got topic="
+                + f"{self.topic} and producer_function={self.producer_function}"
             )
 
         return
