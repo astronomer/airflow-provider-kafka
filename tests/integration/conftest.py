@@ -20,18 +20,20 @@ import os
 
 import pytest
 
-from tests.integration.cluster_fixture import TrivupFixture
-from tests.integration.cluster_fixture import ByoFixture
+from tests.integration.cluster_fixture import ByoFixture, TrivupFixture
 
 work_dir = os.path.dirname(os.path.realpath(__file__))
 
 
 def create_trivup_cluster():
-    return TrivupFixture({'with_sr': True,
-                          'debug': True,
-                          'cp_version': 'latest',
-                          'broker_conf': ['transaction.state.log.replication.factor=1',
-                                          'transaction.state.log.min.isr=1']})
+    return TrivupFixture(
+        {
+            "with_sr": True,
+            "debug": True,
+            "cp_version": "latest",
+            "broker_conf": ["transaction.state.log.replication.factor=1", "transaction.state.log.min.isr=1"],
+        }
+    )
 
 
 def create_byo_cluster(conf):
@@ -71,6 +73,7 @@ def kafka_cluster():
 @pytest.fixture()
 def load_file():
     def get_handle(name):
-        with open(os.path.join(work_dir, 'schema_registry', 'data', name)) as fd:
+        with open(os.path.join(work_dir, "schema_registry", "data", name)) as fd:
             return fd.read()
+
     return get_handle

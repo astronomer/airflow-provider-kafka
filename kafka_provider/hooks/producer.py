@@ -1,10 +1,8 @@
 from typing import Any, Dict, Optional
 
-from confluent_kafka import Producer
-
 from airflow.exceptions import AirflowException
 from airflow.hooks.base import BaseHook
-
+from confluent_kafka import Producer
 
 
 class ProducerHook(BaseHook):
@@ -12,31 +10,31 @@ class ProducerHook(BaseHook):
     A hook to create a Kafka Producer
     """
 
-    default_conn_name = 'kafka_default'
+    default_conn_name = "kafka_default"
 
     def __init__(
         self,
         kafka_conn_id: Optional[str] = None,
-        config: Optional[Dict[Any,Any]] = None,
-        no_broker: bool = False
+        config: Optional[Dict[Any, Any]] = None,
+        no_broker: bool = False,
     ) -> None:
         super().__init__()
 
         self.kafka_conn_id = kafka_conn_id
-        self.config = config
+        self.config: Dict[Any, Any] = config or {}
         self.producer = None
         self.no_broker = no_broker
-        
+
         if not self.no_broker:
-            if not (config.get('bootstrap.servers',None) or self.kafka_conn_id ):
-                raise AirflowException(f"One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
+            if not (self.config.get("bootstrap.servers", None) or self.kafka_conn_id):
+                raise AirflowException(
+                    f"One of config['bootsrap.servers'] or kafka_conn_id must be provided."
+                )
 
-        if config.get('bootstrap.servers',None) and self.kafka_conn_id :
+        if self.config.get("bootstrap.servers", None) and self.kafka_conn_id:
             raise AirflowException(f"One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
-        
 
-
-    def get_producer(self) -> None:
+    def get_producer(self) -> Producer:
         """
         Returns http session to use with requests.
 
@@ -47,7 +45,7 @@ class ProducerHook(BaseHook):
         extra_configs = {}
         if self.kafka_conn_id:
             conn = self.get_connection(self.kafka_conn_id)
-            extra_configs = {'bootstrap.servers':conn}
-        
-        self.producer =  Producer({**extra_configs,**self.config})
+            extra_configs = {"bootstrap.servers": conn}
+
+        self.producer = Producer({**extra_configs, **self.config})
         return self.producer

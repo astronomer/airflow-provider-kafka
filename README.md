@@ -3,9 +3,9 @@
 
 ## Testing
 
-### Unit Tests 
+### Unit Tests
 
-Unit tests are located at `tests/unit`, a kafka server isn't required to run these servers. 
+Unit tests are located at `tests/unit`, a kafka server isn't required to run these servers.
 
 Execute with `pytest tests/unit`.
 

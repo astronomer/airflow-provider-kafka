@@ -18,16 +18,19 @@
 
 from uuid import uuid1
 
-from trivup.clusters.KafkaCluster import KafkaCluster
-
-from confluent_kafka import Consumer, Producer, DeserializingConsumer, \
-    SerializingProducer
+from confluent_kafka import (
+    Consumer,
+    DeserializingConsumer,
+    Producer,
+    SerializingProducer,
+)
 from confluent_kafka.admin import AdminClient, NewTopic
 from confluent_kafka.schema_registry.schema_registry_client import SchemaRegistryClient
+from trivup.clusters.KafkaCluster import KafkaCluster
 
 
 class KafkaClusterFixture(object):
-    __slots__ = ['_cluster', '_admin', '_producer']
+    __slots__ = ["_cluster", "_admin", "_producer"]
 
     def __init__(self, conf):
         raise NotImplementedError("KafkaCluster should never be instantiated directly")
@@ -40,8 +43,7 @@ class KafkaClusterFixture(object):
 
     @classmethod
     def _topic_conf(cls, conf=None):
-        topic_conf = {'num_partitions': 1,
-                      'replication_factor': 1}
+        topic_conf = {"num_partitions": 1, "replication_factor": 1}
 
         if conf is not None:
             topic_conf.update(conf)
@@ -79,10 +81,10 @@ class KafkaClusterFixture(object):
         client_conf = self.client_conf(conf)
 
         if key_serializer is not None:
-            client_conf['key.serializer'] = key_serializer
+            client_conf["key.serializer"] = key_serializer
 
         if value_serializer is not None:
-            client_conf['value.serializer'] = value_serializer
+            client_conf["value.serializer"] = value_serializer
 
         return SerializingProducer(client_conf)
 
@@ -97,10 +99,7 @@ class KafkaClusterFixture(object):
             Consumer: A new Consumer instance
 
         """
-        consumer_conf = self.client_conf({
-            'group.id': str(uuid1()),
-            'auto.offset.reset': 'earliest'
-        })
+        consumer_conf = self.client_conf({"group.id": str(uuid1()), "auto.offset.reset": "earliest"})
 
         if conf is not None:
             consumer_conf.update(conf)
@@ -124,19 +123,16 @@ class KafkaClusterFixture(object):
             Consumer: A new DeserializingConsumer instance
 
         """
-        consumer_conf = self.client_conf({
-            'group.id': str(uuid1()),
-            'auto.offset.reset': 'earliest'
-        })
+        consumer_conf = self.client_conf({"group.id": str(uuid1()), "auto.offset.reset": "earliest"})
 
         if conf is not None:
             consumer_conf.update(conf)
 
         if key_deserializer is not None:
-            consumer_conf['key.deserializer'] = key_deserializer
+            consumer_conf["key.deserializer"] = key_deserializer
 
         if value_deserializer is not None:
-            consumer_conf['value.deserializer'] = value_deserializer
+            consumer_conf["value.deserializer"] = value_deserializer
 
         return DeserializingConsumer(consumer_conf)
 
@@ -153,8 +149,7 @@ class KafkaClusterFixture(object):
             self._admin = AdminClient(self.client_conf())
 
         name = prefix + "-" + str(uuid1())
-        future_topic = self._admin.create_topics([NewTopic(name,
-                                                           **self._topic_conf(conf))])
+        future_topic = self._admin.create_topics([NewTopic(name, **self._topic_conf(conf))])
 
         future_topic.get(name).result()
         return name
@@ -173,10 +168,10 @@ class KafkaClusterFixture(object):
         """
 
         if self._producer is None:
-            self._producer = self.producer(self.client_conf({'linger.ms': 500}))
+            self._producer = self.producer(self.client_conf({"linger.ms": 500}))
 
         if value_source is None:
-            value_source = ['test-data{}'.format(i) for i in range(0, 100)]
+            value_source = ["test-data{}".format(i) for i in range(0, 100)]
 
         if key_source is None:
             key_source = [None]
@@ -203,19 +198,19 @@ class KafkaClusterFixture(object):
         num_keys = len(key_source)
         num_headers = len(header_source) if header_source else 0
 
-        print('# producing {} messages to topic {}'.format(num_messages, topic))
+        print("# producing {} messages to topic {}".format(num_messages, topic))
         for i in range(0, num_messages):
             while True:
                 try:
                     if header_source is not None:
-                        producer.produce(topic,
-                                         value=value_source[i],
-                                         key=key_source[i % num_keys],
-                                         headers=header_source[i % (num_headers + 1)])
+                        producer.produce(
+                            topic,
+                            value=value_source[i],
+                            key=key_source[i % num_keys],
+                            headers=header_source[i % (num_headers + 1)],
+                        )
                     else:
-                        producer.produce(topic,
-                                         value=value_source[i],
-                                         key=key_source[i % num_keys])
+                        producer.produce(topic, value=value_source[i], key=key_source[i % num_keys])
                     break
                 except BufferError:
                     producer.poll(0.1)
@@ -224,7 +219,7 @@ class KafkaClusterFixture(object):
 
         producer.flush()
 
-        print('# finished producing {} messages to topic {}'.format(num_messages, topic))
+        print("# finished producing {} messages to topic {}".format(num_messages, topic))
 
 
 class TrivupFixture(KafkaClusterFixture):
@@ -236,7 +231,7 @@ class TrivupFixture(KafkaClusterFixture):
     """
 
     default_options = {
-        'broker_cnt': 1,
+        "broker_cnt": 1,
     }
 
     def __init__(self, conf):
@@ -246,10 +241,10 @@ class TrivupFixture(KafkaClusterFixture):
         self._cluster.wait_operational()
 
     def schema_registry(self, conf=None):
-        if not hasattr(self._cluster, 'sr'):
+        if not hasattr(self._cluster, "sr"):
             return None
 
-        sr_conf = {'url': self._cluster.sr.get('url')}
+        sr_conf = {"url": self._cluster.sr.get("url")}
         if conf is not None:
             sr_conf.update(conf)
         return SchemaRegistryClient(sr_conf)
@@ -280,8 +275,7 @@ class ByoFixture(KafkaClusterFixture):
 
     def __init__(self, conf):
         if conf.get("bootstrap.servers", "") == "":
-            raise ValueError("'bootstrap.servers' must be set in the "
-                             "conf dict")
+            raise ValueError("'bootstrap.servers' must be set in the " "conf dict")
         self._admin = None
         self._producer = None
         self._conf = conf.copy()
