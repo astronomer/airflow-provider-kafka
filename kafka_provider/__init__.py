@@ -16,4 +16,4 @@ def get_provider_info():
     }
 
 
-__version__ = "0.0.0"
+__version__ = "0.0.0a"
