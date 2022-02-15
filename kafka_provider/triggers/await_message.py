@@ -2,7 +2,7 @@ import asyncio
 from functools import partial
 from asyncore import poll
 from os import sync
-from typing import Any, Dict, Optional, Tuple, Union, Callable
+from typing import Any, Dict, Optional, Tuple, Union, Callable, Sequence
 
 from airflow import AirflowException
 from airflow.triggers.base import BaseTrigger, TriggerEvent
@@ -13,7 +13,7 @@ from kafka_provider.shared_utils import get_callable
 
 
 
-class AwaitMessage(BaseTrigger):
+class AwaitMessageTrigger(BaseTrigger):
 
     def __init__(
         self,
@@ -24,6 +24,7 @@ class AwaitMessage(BaseTrigger):
         kafka_conn_id: Optional[str] = None,
         kafka_config: Optional[Dict[Any,Any]] = None,
         poll_timeout: float = 1,
+        poll_interval: float = 5,
     )-> None:
 
         self.topics = topics
@@ -33,13 +34,21 @@ class AwaitMessage(BaseTrigger):
         self.kafka_conn_id = kafka_conn_id
         self.kafka_config = kafka_config
         self.poll_timeout = poll_timeout
+        self.poll_interval = poll_interval
 
 
     def serialize(self) -> Tuple[str, Dict[str, Any]]:
         return(
-            'kafka_provider.triggers.await_message.AwaitMessage',
+            'kafka_provider.triggers.await_message.AwaitMessageTrigger',
             {
-
+            "topics" : self.topics,
+            "apply_function" : self.apply_function,
+            "apply_function_args" : self.apply_function_args,
+            "apply_function_kwargs" : self.apply_function_kwargs,
+            "kafka_conn_id" : self.kafka_conn_id,
+            "kafka_config" : self.kafka_config,
+            "poll_timeout" : self.poll_timeout,
+            "poll_interval" : self.poll_interval
             }
         )
 
@@ -60,15 +69,17 @@ class AwaitMessage(BaseTrigger):
 
             message = await async_poll(self.poll_timeout)
 
-            rv = async_message_process(message)
+            rv = await async_message_process(message)
             if rv:
                 yield TriggerEvent(rv)
-            async_commit(asynchronous=False)
-
-            # get the consumer
-            # await poll return
-            # await message processing
-            # if callable has a value : yield TriggerEvent(return Value)
+                await async_commit(asynchronous=False)
+            elif rv is None:
+                await async_commit(asynchronous=False)
+                await asyncio.sleep(self.poll_interval)
+            else:
+                await async_commit(asynchronous=False)
+                
+            
 
     
  

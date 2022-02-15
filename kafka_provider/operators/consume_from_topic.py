@@ -86,6 +86,8 @@ class ConsumeFromTopic(BaseOperator):
         if self.commit_cadence:
             consumer.commit()
 
+        consumer.close()
+        
         return messages_processed
 
 

@@ -66,7 +66,4 @@ class ProduceToTopic(BaseOperator):
         while producer.flush(self.flush_timeout) :
             pass
         
-
-        producer.close()
-        
         pass
