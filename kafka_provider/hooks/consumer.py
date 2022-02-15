@@ -1,5 +1,4 @@
-from typing import Any, Dict, List, Optional
-from xmlrpc.client import Boolean
+from typing import Any, Dict, Optional, Sequence
 
 from airflow.exceptions import AirflowException
 from airflow.hooks.base import BaseHook
@@ -24,7 +23,7 @@ class ConsumerHook(BaseHook):
 
     def __init__(
         self,
-        topics: List[str],
+        topics: Sequence[str],
         kafka_conn_id: Optional[str] = None,
         config: Optional[Dict[Any, Any]] = None,
         no_broker: Optional[bool] = False,
@@ -32,9 +31,9 @@ class ConsumerHook(BaseHook):
         super().__init__()
 
         self.kafka_conn_id = kafka_conn_id
-        self.config = config
+        self.config: Dict[Any, Any] = config or {}
         self.topics = topics
-        self.consumer = None
+
         self.no_broker = no_broker
 
         if not self.no_broker:
@@ -44,14 +43,12 @@ class ConsumerHook(BaseHook):
                 )
 
             if not (self.config.get("bootstrap.servers", None) or self.kafka_conn_id):
-                raise AirflowException(
-                    f"One of config['bootsrap.servers'] or kafka_conn_id must be provided."
-                )
+                raise AirflowException("One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
 
         if self.config.get("bootstrap.servers", None) and self.kafka_conn_id:
-            raise AirflowException(f"One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
+            raise AirflowException("One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
 
-    def get_consumer(self) -> None:
+    def get_consumer(self) -> Consumer:
         """
         Returns a Consumer that has been subscribed to topics.
         """

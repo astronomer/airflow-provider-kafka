@@ -9,22 +9,14 @@ Run test:
 
 """
 
-import logging
-import os
 import unittest
-from ast import excepthandler
 from unittest import mock
 
 import pytest
 from airflow import AirflowException
 
-#
-from confluent_kafka import Consumer
-
 # Import Hook
 from kafka_provider.hooks.consumer import ConsumerHook
-
-log = logging.getLogger(__name__)
 
 
 # Mock the `conn_sample` Airflow connection
@@ -39,21 +31,21 @@ class TestConsumerHook(unittest.TestCase):
 
         # Standard Init
         extra_configs = {"socket.timeout.ms": 10, "group.id": "test"}
-        c = ConsumerHook(["test_1"], kafka_conn_id="kafka_sample", config=extra_configs)
+        ConsumerHook(["test_1"], kafka_conn_id="kafka_sample", config=extra_configs)
 
         # Too Many Args
         with pytest.raises(AirflowException):
             extra_configs = {"bootstrap.servers": "localhost:9092", "group.id": "test2"}
-            c = ConsumerHook(["test_1"], kafka_conn_id="kafka_sample", config=extra_configs)
+            ConsumerHook(["test_1"], kafka_conn_id="kafka_sample", config=extra_configs)
 
         # Not Enough Args
         with pytest.raises(AirflowException):
             extra_configs = {"group.id": "test3"}
-            c = ConsumerHook(["test_1"], config=extra_configs)
+            ConsumerHook(["test_1"], config=extra_configs)
 
         with pytest.raises(AirflowException):
             extra_configs = {}
-            c = ConsumerHook(["test_1"], config=extra_configs)
+            ConsumerHook(["test_1"], config=extra_configs)
 
 
 if __name__ == "__main__":

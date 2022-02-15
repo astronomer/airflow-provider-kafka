@@ -1,12 +1,4 @@
-import logging
-import os
-import unittest
-from unittest import mock
-
-import pytest
-from airflow import AirflowException
-
-from kafka_provider.shared_utils import get_callable, simple_producer
+from kafka_provider.shared_utils import get_callable
 
 
 def test_get_callable():

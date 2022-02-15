@@ -1,10 +1,6 @@
-from email import message_from_string
-from functools import partial
-from typing import Any, Callable, Dict, Optional, Sequence
+from typing import Any, Dict, Optional, Sequence
 
-from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
-from airflow.utils.decorators import apply_defaults
 
 from kafka_provider.triggers.await_message import AwaitMessageTrigger
 

@@ -1,10 +1,7 @@
 import asyncio
-from asyncore import poll
 from functools import partial
-from os import sync
-from typing import Any, Callable, Dict, Optional, Sequence, Tuple, Union
+from typing import Any, Dict, Optional, Sequence, Tuple
 
-from airflow import AirflowException
 from airflow.triggers.base import BaseTrigger, TriggerEvent
 from asgiref.sync import sync_to_async
 

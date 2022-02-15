@@ -10,7 +10,6 @@ Run test:
 """
 
 import logging
-import os
 import unittest
 from unittest import mock
 
@@ -39,19 +38,19 @@ class TestSampleHook(unittest.TestCase):
         # Standard Init
         extra_configs = {"socket.timeout.ms": 10}
         h = AdminClientHook(kafka_conn_id="kafka_sample", config=extra_configs)
-        assert not hasattr(h,'admin_client')
+        assert not hasattr(h, "admin_client")
 
         # Too Many Args
         with pytest.raises(AirflowException):
             extra_configs = {"bootstrap.servers": "localhost:9092"}
             h = AdminClientHook(kafka_conn_id="kafka_sample", config=extra_configs)
-            assert not hasattr(h,'admin_client')
+            assert not hasattr(h, "admin_client")
 
         # Not Enough Args
         with pytest.raises(AirflowException):
             extra_configs = {}
             h = AdminClientHook(config=extra_configs)
-            assert not hasattr(h,'admin_client')
+            assert not hasattr(h, "admin_client")
 
     def test_get_admin_client(self):
         """test getting our client"""

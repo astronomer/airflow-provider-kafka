@@ -9,13 +9,9 @@ Run test:
 
 """
 
-import json
 import logging
-import os
 import unittest
 from unittest import mock
-
-import pytest
 
 # Import Operator
 from kafka_provider.operators.consume_from_topic import ConsumeFromTopic
@@ -42,7 +38,7 @@ class TestConsumeFromTopic(unittest.TestCase):
         )
 
         # execute the operator (this is essentially a no op as the broker isn't setup)
-        response_payload = operator.execute(context={})
+        operator.execute(context={})
 
 
 if __name__ == "__main__":

@@ -1,10 +1,8 @@
-from email import message_from_string
 from functools import partial
-from typing import Any, Callable, Dict, Optional, Sequence
+from typing import Any, Dict, Optional, Sequence
 
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
-from airflow.utils.decorators import apply_defaults
 
 from kafka_provider.hooks.consumer import ConsumerHook
 from kafka_provider.shared_utils import get_callable
@@ -53,7 +51,9 @@ class ConsumeFromTopic(BaseOperator):
 
         if self.max_messages and self.max_batch_size > self.max_messages:
             self.log.warn(
-                f"max_batch_size ({self.max_batch_size}) > max_messages ({self.max_messages}). Setting max_messages to {self.max_batch_size}"
+                f"max_batch_size ({self.max_batch_size}) > max_messages"
+                f" ({self.max_messages}). Setting max_messages to"
+                f" {self.max_batch_size}"
             )
 
         if self.commit_cadence == "never":

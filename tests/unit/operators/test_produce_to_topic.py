@@ -9,14 +9,10 @@ Run test:
 
 """
 
-import json
-import logging
-import os
-import unittest
-from ast import operator
-from unittest import mock
 
-import pytest
+import logging
+import unittest
+from unittest import mock
 
 from kafka_provider.operators.produce_to_topic import ProduceToTopic
 
@@ -41,7 +37,7 @@ class TestProduceToTopic(unittest.TestCase):
             synchronous=False,
         )
 
-        response_payload = operator.execute(context={})
+        operator.execute(context={})
 
 
 if __name__ == "__main__":

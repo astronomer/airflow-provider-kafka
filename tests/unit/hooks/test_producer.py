@@ -10,15 +10,11 @@ Run test:
 """
 
 import logging
-import os
 import unittest
 from unittest import mock
 
 import pytest
 from airflow import AirflowException
-
-#
-from confluent_kafka import Producer
 
 # Import Hook
 from kafka_provider.hooks.producer import ProducerHook

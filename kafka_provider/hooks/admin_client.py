@@ -1,5 +1,4 @@
-import functools
-from typing import Any, Dict, List, Optional, Sequence
+from typing import Any, Dict, Optional, Sequence
 
 from airflow.exceptions import AirflowException
 from airflow.hooks.base import BaseHook
@@ -8,7 +7,7 @@ from confluent_kafka.admin import AdminClient, NewTopic
 
 def client_required(method):
     def inner(ref, *args, **kwargs):
-        if not hasattr(ref,'admin_client'):
+        if not hasattr(ref, "admin_client"):
             ref.get_admin_client()
         return method(ref, *args, **kwargs)
 
@@ -29,10 +28,10 @@ class AdminClientHook(BaseHook):
         self.config: Dict[Any, Any] = config or {}
 
         if not (self.config.get("bootstrap.servers", None) or self.kafka_conn_id):
-            raise AirflowException(f"One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
+            raise AirflowException("One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
 
         if self.config.get("bootstrap.servers", None) and self.kafka_conn_id:
-            raise AirflowException(f"One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
+            raise AirflowException("One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
 
     def get_admin_client(self) -> None:
         """

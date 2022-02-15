@@ -1,6 +1,4 @@
 import json
-from distutils.command.config import config
-from socket import timeout
 
 from confluent_kafka import Consumer, Producer
 from confluent_kafka.admin import AdminClient, NewTopic
