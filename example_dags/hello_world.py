@@ -4,6 +4,9 @@ from textwrap import dedent
 
 
 from airflow import DAG
+import logging
+import json
+from kafka_provider.operators.consume_from_topic import ConsumeFromTopic
 from kafka_provider.operators.produce_to_topic import ProduceToTopic
 
 
@@ -21,7 +24,16 @@ default_args = {
 
 def producer_function():
     for i in range(20):
-        yield (bytes(i),bytes(i+1))
+        yield (json.dumps(i),json.dumps(i+1))
+
+
+consumer_logger = logging.getLogger("airflow")
+def consumer_function(message, prefix=None):
+    key = json.loads(message.key())
+    value = json.loads(message.value())
+    consumer_logger.info(f"{prefix} {message.topic()} @ {message.offset()}; {key} : {value}")
+    return
+
 
 
 with DAG(
@@ -39,5 +51,35 @@ with DAG(
         topic='test_1',
         producer_function='hello_world.producer_function',
         kafka_config={"bootstrap.servers": "broker:29092"}
-
     )
+
+    t2 = ConsumeFromTopic(
+        task_id = 'consume_from_topic',
+        topics = ['test_1'],
+        apply_function='hello_world.consumer_function',
+        apply_function_kwargs={'prefix': 'consumed:::'},
+        consumer_config={"bootstrap.servers": "broker:29092","group.id": "foo", "enable.auto.commit": False, "auto.offset.reset": "beginning"},
+        commit_cadence='end_of_batch',
+        max_messages=10,
+        max_batch_size=2
+    )
+
+    t3 = ProduceToTopic(
+        task_id = 'produce_to_topic_2',
+        topic='test_1',
+        producer_function='hello_world.producer_function',
+        kafka_config={"bootstrap.servers": "broker:29092"}
+    )
+
+    t4 = ConsumeFromTopic(
+        task_id = 'consume_from_topic_2',
+        topics = ['test_1'],
+        apply_function='hello_world.consumer_function',
+        apply_function_kwargs={'prefix': 'consumed:::'},
+        consumer_config={"bootstrap.servers": "broker:29092","group.id": "foo", "enable.auto.commit": False, "auto.offset.reset": "beginning"},
+        commit_cadence='end_of_batch',
+        max_messages=30,
+        max_batch_size=10
+    )
+
+    t1 >> t2 >> t3 >> t4

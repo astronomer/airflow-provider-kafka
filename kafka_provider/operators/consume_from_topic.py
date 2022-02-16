@@ -85,12 +85,15 @@ class ConsumeFromTopic(BaseOperator):
                 self.log.info("Reached end of log. Exiting.")
                 break
 
-            map(apply_callable, msgs)
+            for m in msgs:
+                apply_callable(m)
 
             if self.commit_cadence == "end_of_batch":
+                self.log.info(f'committing offset at {self.commit_cadence}')
                 consumer.commit()
 
         if self.commit_cadence:
+            self.log.info(f'committing offset at {self.commit_cadence}')
             consumer.commit()
 
         consumer.close()
