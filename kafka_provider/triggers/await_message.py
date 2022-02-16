@@ -2,6 +2,7 @@ import asyncio
 from functools import partial
 from typing import Any, Dict, Optional, Sequence, Tuple
 
+from airflow import AirflowException
 from airflow.triggers.base import BaseTrigger, TriggerEvent
 from asgiref.sync import sync_to_async
 
@@ -14,8 +15,8 @@ class AwaitMessageTrigger(BaseTrigger):
         self,
         topics: Sequence[str],
         apply_function: str,
-        apply_function_args: Sequence[Any],
-        apply_function_kwargs: Dict[Any, Any],
+        apply_function_args: Optional[Sequence[Any]] = None,
+        apply_function_kwargs: Optional[Dict[Any, Any]] = None,
         kafka_conn_id: Optional[str] = None,
         kafka_config: Optional[Dict[Any, Any]] = None,
         poll_timeout: float = 1,
@@ -24,8 +25,8 @@ class AwaitMessageTrigger(BaseTrigger):
 
         self.topics = topics
         self.apply_function = apply_function
-        self.apply_function_args = apply_function_args
-        self.apply_function_kwargs = apply_function_kwargs
+        self.apply_function_args = apply_function_args or ()
+        self.apply_function_kwargs = apply_function_kwargs or {}
         self.kafka_conn_id = kafka_conn_id
         self.kafka_config = kafka_config
         self.poll_timeout = poll_timeout
@@ -51,7 +52,6 @@ class AwaitMessageTrigger(BaseTrigger):
             topics=self.topics,
             kafka_conn_id=self.kafka_conn_id,
             config=self.kafka_config,
-            no_broker=self.no_broker,
         )
 
         async_get_consumer = sync_to_async(consumer_hook.get_consumer)
@@ -67,12 +67,16 @@ class AwaitMessageTrigger(BaseTrigger):
 
             message = await async_poll(self.poll_timeout)
 
-            rv = await async_message_process(message)
-            if rv:
-                yield TriggerEvent(rv)
-                await async_commit(asynchronous=False)
-            elif rv is None:
-                await async_commit(asynchronous=False)
-                await asyncio.sleep(self.poll_interval)
+            if message is None:
+                continue
+            elif message.error():
+                raise AirflowException(f"Error: {message.error()}")
             else:
-                await async_commit(asynchronous=False)
+
+                rv = await async_message_process(message)
+                if rv:
+                    await async_commit(asynchronous=False)
+                    yield TriggerEvent(rv)
+                else:
+                    await async_commit(asynchronous=False)
+                    await asyncio.sleep(self.poll_interval)

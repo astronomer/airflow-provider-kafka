@@ -16,8 +16,8 @@ class AwaitKafkaMessage(BaseOperator):
         self,
         topics: Sequence[str],
         apply_function: str,
-        apply_function_args: Sequence[Any],
-        apply_function_kwargs: Dict[Any, Any],
+        apply_function_args: Optional[Sequence[Any]] = None,
+        apply_function_kwargs: Optional[Dict[Any, Any]] = None,
         kafka_conn_id: Optional[str] = None,
         kafka_config: Optional[Dict[Any, Any]] = None,
         poll_timeout: float = 1,
@@ -49,7 +49,8 @@ class AwaitKafkaMessage(BaseOperator):
                 kafka_config=self.kafka_config,
                 poll_timeout=self.poll_timeout,
                 poll_interval=self.poll_interval,
-            )
+            ),
+            method_name="execute_complete",
         )
 
     def execute_complete(self, context, event=None):

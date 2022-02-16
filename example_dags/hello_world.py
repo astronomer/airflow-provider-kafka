@@ -4,6 +4,7 @@ from datetime import datetime, timedelta
 
 from airflow import DAG
 
+from kafka_provider.operators.await_message import AwaitKafkaMessage
 from kafka_provider.operators.consume_from_topic import ConsumeFromTopic
 from kafka_provider.operators.produce_to_topic import ProduceToTopic
 
@@ -31,6 +32,11 @@ def consumer_function(message, prefix=None):
     value = json.loads(message.value())
     consumer_logger.info(f"{prefix} {message.topic()} @ {message.offset()}; {key} : {value}")
     return
+
+
+def await_function(message):
+    if json.loads(message.value()) % 5 == 0:
+        return f" Got the following message: {json.loads(message.value())}"
 
 
 with DAG(
@@ -89,4 +95,17 @@ with DAG(
         max_batch_size=10,
     )
 
-    t1 >> t2 >> t3 >> t4
+    t5 = AwaitKafkaMessage(
+        task_id="awaiting_message",
+        topics=["test_1"],
+        apply_function="hello_world.await_function",
+        kafka_config={
+            "bootstrap.servers": "broker:29092",
+            "group.id": "awaiting_message",
+            "enable.auto.commit": False,
+            "auto.offset.reset": "beginning",
+        },
+        xcom_push_key="retrieved_message",
+    )
+
+    t1 >> t2 >> t3 >> t4 >> t5
