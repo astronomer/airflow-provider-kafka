@@ -62,9 +62,9 @@ class ProduceToTopic(BaseOperator):
             producer.produce(self.topic, key=k, value=v, on_delivery=self.delivery_callback)
             producer.poll(self.poll_timeout)
             if self.synchronous:
-                while producer.flush(self.flush_timeout):
-                    pass
+                producer.flush()
 
+        
         while producer.flush(self.flush_timeout):
             pass
 
