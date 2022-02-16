@@ -7,6 +7,18 @@ from airflow.models import BaseOperator
 from kafka_provider.hooks.producer import ProducerHook
 from kafka_provider.shared_utils import get_callable
 
+import logging
+
+
+local_logger: logging.log = logging.getLogger("airflow")
+
+
+def acked(err, msg):
+    if err is not None:
+        local_logger.error(f"Failed to deliver message: {err}")
+    else:
+        local_logger.info(f"Produced record to topic {msg.topic()} partition [{msg.partition()}] @ offset {msg.offset()}")
+
 
 class ProduceToTopic(BaseOperator):
     def __init__(
@@ -15,16 +27,19 @@ class ProduceToTopic(BaseOperator):
         producer_function: str = None,
         producer_function_args: Optional[Sequence[Any]] = None,
         producer_function_kwargs: Optional[Dict[Any, Any]] = None,
-        delivery_callback: Optional[Callable[..., Dict[bytes, bytes]]] = None,
+        delivery_callback: Optional[str] = None,
         kafka_conn_id: Optional[str] = None,
         synchronous: Optional[bool] = True,
         kafka_config: Optional[Dict[Any, Any]] = None,
         no_broker: bool = False,
-        flush_timeout: float = 0,
         poll_timeout: float = 0,
         **kwargs: Any,
     ) -> None:
         super().__init__(**kwargs)
+
+
+        if delivery_callback:
+            delivery_callback = get_callable(delivery_callback)
 
         self.kafka_conn_id = kafka_conn_id
         self.kafka_config = kafka_config
@@ -32,10 +47,9 @@ class ProduceToTopic(BaseOperator):
         self.producer_function: str = producer_function or ""
         self.producer_function_args = producer_function_args or ()
         self.producer_function_kwargs = producer_function_kwargs or {}
-        self.delivery_callback = delivery_callback or (lambda *args, **kwargs: None)
+        self.delivery_callback = delivery_callback or acked
         self.synchronous = synchronous
         self.no_broker = no_broker
-        self.flush_timeout = flush_timeout
         self.poll_timeout = poll_timeout
 
         if not (self.topic and self.producer_function):
@@ -65,7 +79,6 @@ class ProduceToTopic(BaseOperator):
                 producer.flush()
 
         
-        while producer.flush(self.flush_timeout):
-            pass
+        producer.flush()
 
         pass
