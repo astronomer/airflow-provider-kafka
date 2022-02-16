@@ -31,7 +31,7 @@ class ProducerHook(BaseHook):
 
         if self.config.get("bootstrap.servers", None) and self.kafka_conn_id:
             raise AirflowException("One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
-        
+
     def get_producer(self) -> Producer:
         """
         Returns http session to use with requests.
@@ -44,11 +44,12 @@ class ProducerHook(BaseHook):
         if self.kafka_conn_id:
             conn = self.get_connection(self.kafka_conn_id)
             extra_configs = {"bootstrap.servers": conn}
-            self.log.info(f"Connection ID {self.kafka_conn_id} used for bootstrap servers, {extra_configs} added to kafka config.")
+            self.log.info(
+                f"Connection ID {self.kafka_conn_id} used for bootstrap servers,"
+                + " {extra_configs} added to kafka config."
+            )
 
         self.producer = Producer({**extra_configs, **self.config})
 
-        self.log.info(f"Producer")
+        self.log.info(f"Producer {self.producer}")
         return self.producer
-
-    

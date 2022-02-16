@@ -89,11 +89,11 @@ class ConsumeFromTopic(BaseOperator):
                 apply_callable(m)
 
             if self.commit_cadence == "end_of_batch":
-                self.log.info(f'committing offset at {self.commit_cadence}')
+                self.log.info(f"committing offset at {self.commit_cadence}")
                 consumer.commit()
 
         if self.commit_cadence:
-            self.log.info(f'committing offset at {self.commit_cadence}')
+            self.log.info(f"committing offset at {self.commit_cadence}")
             consumer.commit()
 
         consumer.close()
