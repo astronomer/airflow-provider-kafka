@@ -4,9 +4,9 @@ from datetime import datetime, timedelta
 
 from airflow import DAG
 
-from kafka_provider.operators.await_message import AwaitKafkaMessage
-from kafka_provider.operators.consume_from_topic import ConsumeFromTopic
-from kafka_provider.operators.produce_to_topic import ProduceToTopic
+from kafka_provider.operators.await_message import AwaitKafkaMessageOperator
+from kafka_provider.operators.consume_from_topic import ConsumeFromTopicOperator
+from kafka_provider.operators.produce_to_topic import ProduceToTopicOperator
 
 default_args = {
     "owner": "airflow",
@@ -49,14 +49,14 @@ with DAG(
     tags=["example"],
 ) as dag:
 
-    t1 = ProduceToTopic(
+    t1 = ProduceToTopicOperator(
         task_id="produce_to_topic",
         topic="test_1",
         producer_function="hello_world.producer_function",
         kafka_config={"bootstrap.servers": "broker:29092"},
     )
 
-    t2 = ConsumeFromTopic(
+    t2 = ConsumeFromTopicOperator(
         task_id="consume_from_topic",
         topics=["test_1"],
         apply_function="hello_world.consumer_function",
@@ -72,14 +72,14 @@ with DAG(
         max_batch_size=2,
     )
 
-    t3 = ProduceToTopic(
+    t3 = ProduceToTopicOperator(
         task_id="produce_to_topic_2",
         topic="test_1",
         producer_function="hello_world.producer_function",
         kafka_config={"bootstrap.servers": "broker:29092"},
     )
 
-    t4 = ConsumeFromTopic(
+    t4 = ConsumeFromTopicOperator(
         task_id="consume_from_topic_2",
         topics=["test_1"],
         apply_function="hello_world.consumer_function",
@@ -95,7 +95,7 @@ with DAG(
         max_batch_size=10,
     )
 
-    t5 = AwaitKafkaMessage(
+    t5 = AwaitKafkaMessageOperator(
         task_id="awaiting_message",
         topics=["test_1"],
         apply_function="hello_world.await_function",

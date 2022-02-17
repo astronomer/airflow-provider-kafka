@@ -10,7 +10,7 @@ from kafka_provider.shared_utils import get_callable
 VALID_COMMIT_CADENCE = {"never", "end_of_batch", "end_of_operator"}
 
 
-class ConsumeFromTopic(BaseOperator):
+class ConsumeFromTopicOperator(BaseOperator):
 
     BLUE = "#ffefeb"
     ui_color = BLUE

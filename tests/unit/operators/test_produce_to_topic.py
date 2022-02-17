@@ -14,7 +14,7 @@ import logging
 import unittest
 from unittest import mock
 
-from kafka_provider.operators.produce_to_topic import ProduceToTopic
+from kafka_provider.operators.produce_to_topic import ProduceToTopicOperator
 
 log = logging.getLogger(__name__)
 
@@ -27,7 +27,7 @@ class TestProduceToTopic(unittest.TestCase):
     """
 
     def test_operator(self):
-        operator = ProduceToTopic(
+        operator = ProduceToTopicOperator(
             topic="test_1",
             producer_function="kafka_provider.shared_utils.simple_producer",
             producer_function_args=(b"test", b"test"),

@@ -20,7 +20,7 @@ def acked(err, msg):
         )
 
 
-class ProduceToTopic(BaseOperator):
+class ProduceToTopicOperator(BaseOperator):
     def __init__(
         self,
         topic: str = None,

@@ -7,7 +7,7 @@ from kafka_provider.triggers.await_message import AwaitMessageTrigger
 VALID_COMMIT_CADENCE = {"never", "end_of_batch", "end_of_operator"}
 
 
-class AwaitKafkaMessage(BaseOperator):
+class AwaitKafkaMessageOperator(BaseOperator):
 
     BLUE = "#ffefeb"
     ui_color = BLUE
