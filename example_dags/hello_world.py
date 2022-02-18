@@ -1,3 +1,4 @@
+import functools
 import json
 import logging
 from datetime import datetime, timedelta
@@ -75,15 +76,14 @@ with DAG(
     t3 = ProduceToTopicOperator(
         task_id="produce_to_topic_2",
         topic="test_1",
-        producer_function="hello_world.producer_function",
+        producer_function=producer_function,
         kafka_config={"bootstrap.servers": "broker:29092"},
     )
 
     t4 = ConsumeFromTopicOperator(
         task_id="consume_from_topic_2",
         topics=["test_1"],
-        apply_function="hello_world.consumer_function",
-        apply_function_kwargs={"prefix": "consumed:::"},
+        apply_function=functools.partial(consumer_function, prefix="consumed:::"),
         consumer_config={
             "bootstrap.servers": "broker:29092",
             "group.id": "foo",
