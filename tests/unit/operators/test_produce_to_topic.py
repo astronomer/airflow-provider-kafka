@@ -32,8 +32,7 @@ class TestProduceToTopic(unittest.TestCase):
             producer_function="kafka_provider.shared_utils.simple_producer",
             producer_function_args=(b"test", b"test"),
             task_id="test",
-            kafka_config={"socket.timeout.ms": 10, "message.timeout.ms": 10},
-            no_broker=True,
+            kafka_config={"socket.timeout.ms": 10, "message.timeout.ms": 10, "bootstrap.servers": "test"},
             synchronous=False,
         )
 

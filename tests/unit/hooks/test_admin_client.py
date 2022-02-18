@@ -16,11 +16,8 @@ from unittest import mock
 import pytest
 from airflow import AirflowException
 
-#
-from confluent_kafka.admin import AdminClient
-
 # Import Hook
-from kafka_provider.hooks.admin_client import AdminClientHook
+from kafka_provider.hooks.admin_client import KafkaAdminClientHook
 
 log = logging.getLogger(__name__)
 
@@ -37,36 +34,34 @@ class TestSampleHook(unittest.TestCase):
 
         # Standard Init
         extra_configs = {"socket.timeout.ms": 10}
-        h = AdminClientHook(kafka_conn_id="kafka_sample", config=extra_configs)
-        assert not hasattr(h, "admin_client")
+        KafkaAdminClientHook(kafka_conn_id="kafka_sample", config=extra_configs)
 
         # Too Many Args
         with pytest.raises(AirflowException):
             extra_configs = {"bootstrap.servers": "localhost:9092"}
-            h = AdminClientHook(kafka_conn_id="kafka_sample", config=extra_configs)
-            assert not hasattr(h, "admin_client")
+            KafkaAdminClientHook(kafka_conn_id="kafka_sample", config=extra_configs)
 
         # Not Enough Args
         with pytest.raises(AirflowException):
             extra_configs = {}
-            h = AdminClientHook(config=extra_configs)
-            assert not hasattr(h, "admin_client")
+            KafkaAdminClientHook(config=extra_configs)
 
     def test_get_admin_client(self):
         """test getting our client"""
         extra_configs = {"socket.timeout.ms": 10}
-        h = AdminClientHook(kafka_conn_id="kafka_sample", config=extra_configs)
-
-        h.kafka_conn_id = None  # This is a hack to make sure we don't actually try to connect to the client
-
+        h = KafkaAdminClientHook(kafka_conn_id="kafka_sample", config=extra_configs)
+        h.extra_configs[
+            "bootstrap.servers"
+        ] = None  # This is a hack to make sure we don't actually try to connect to the client
         h.get_admin_client()
-        assert isinstance(h.admin_client, AdminClient)
 
     def test_create_topic(self):
         """test topic creation"""
         extra_configs = {"socket.timeout.ms": 10}
-        h = AdminClientHook(kafka_conn_id="kafka_sample", config=extra_configs)
-        h.kafka_conn_id = None  # This is a hack to make sure we don't actually try to connect to the client
+        h = KafkaAdminClientHook(kafka_conn_id="kafka_sample", config=extra_configs)
+        h.extra_configs[
+            "bootstrap.servers"
+        ] = None  # This is a hack to make sure we don't actually try to connect to the client
         h.create_topic(topics=[("test_1", 3, 3), ("test_2", 1, 1)])
 
 

@@ -5,7 +5,7 @@ from typing import Any, Dict, Optional, Sequence
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
 
-from kafka_provider.hooks.producer import ProducerHook
+from kafka_provider.hooks.producer import KafkaProducerHook
 from kafka_provider.shared_utils import get_callable
 
 local_logger = logging.getLogger("airflow")
@@ -31,7 +31,6 @@ class ProduceToTopicOperator(BaseOperator):
         kafka_conn_id: Optional[str] = None,
         synchronous: Optional[bool] = True,
         kafka_config: Optional[Dict[Any, Any]] = None,
-        no_broker: bool = False,
         poll_timeout: float = 0,
         **kwargs: Any,
     ) -> None:
@@ -50,7 +49,6 @@ class ProduceToTopicOperator(BaseOperator):
         self.producer_function_kwargs = producer_function_kwargs or {}
         self.delivery_callback = dc
         self.synchronous = synchronous
-        self.no_broker = no_broker
         self.poll_timeout = poll_timeout
 
         if not (self.topic and self.producer_function):
@@ -64,8 +62,8 @@ class ProduceToTopicOperator(BaseOperator):
     def execute(self, context) -> Any:
 
         # Get producer and callable
-        producer = ProducerHook(
-            kafka_conn_id=self.kafka_conn_id, config=self.kafka_config, no_broker=self.no_broker
+        producer = KafkaProducerHook(
+            kafka_conn_id=self.kafka_conn_id, config=self.kafka_config
         ).get_producer()
         producer_callable = get_callable(self.producer_function)
         producer_callable = partial(
@@ -80,5 +78,3 @@ class ProduceToTopicOperator(BaseOperator):
                 producer.flush()
 
         producer.flush()
-
-        pass

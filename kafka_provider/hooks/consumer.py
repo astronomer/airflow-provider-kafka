@@ -5,16 +5,7 @@ from airflow.hooks.base import BaseHook
 from confluent_kafka import Consumer
 
 
-def client_required(method):
-    def inner(ref, *args, **kwargs):
-        if not ref.consumer:
-            ref.get_consumer()
-        return method(ref, *args, **kwargs)
-
-    return inner
-
-
-class ConsumerHook(BaseHook):
+class KafkaConsumerHook(BaseHook):
     """
     A hook to create a Kafka Producer
     """
@@ -26,7 +17,6 @@ class ConsumerHook(BaseHook):
         topics: Sequence[str],
         kafka_conn_id: Optional[str] = None,
         config: Optional[Dict[Any, Any]] = None,
-        no_broker: Optional[bool] = False,
     ) -> None:
         super().__init__()
 
@@ -34,31 +24,28 @@ class ConsumerHook(BaseHook):
         self.config: Dict[Any, Any] = config or {}
         self.topics = topics
 
-        self.no_broker = no_broker
+        if not self.config.get("group.id", None):
+            raise AirflowException(
+                "The 'group.id' parameter must be set in the config dictionary'. Got <None>"
+            )
 
-        if not self.no_broker:
-            if not self.config.get("group.id", None):
-                raise AirflowException(
-                    "The 'group.id' parameter must be set in the config dictionary'. Got <None>"
-                )
-
-            if not (self.config.get("bootstrap.servers", None) or self.kafka_conn_id):
-                raise AirflowException("One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
+        if not (self.config.get("bootstrap.servers", None) or self.kafka_conn_id):
+            raise AirflowException("One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
 
         if self.config.get("bootstrap.servers", None) and self.kafka_conn_id:
             raise AirflowException("One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
+
+        self.extra_configs = {}
+        if self.kafka_conn_id:
+            conn = self.get_connection(self.kafka_conn_id)
+            self.extra_configs = {"bootstrap.servers": conn}
 
     def get_consumer(self) -> Consumer:
         """
         Returns a Consumer that has been subscribed to topics.
         """
-        extra_configs = {}
-        if self.kafka_conn_id:
-            conn = self.get_connection(self.kafka_conn_id)
-            extra_configs = {"bootstrap.servers": conn}
 
-        consumer = Consumer({**extra_configs, **self.config})
+        consumer = Consumer({**self.extra_configs, **self.config})
         consumer.subscribe(self.topics)
 
-        self.consumer = consumer
-        return self.consumer
+        return consumer

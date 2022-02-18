@@ -6,7 +6,7 @@ from airflow import AirflowException
 from airflow.triggers.base import BaseTrigger, TriggerEvent
 from asgiref.sync import sync_to_async
 
-from kafka_provider.hooks.consumer import ConsumerHook
+from kafka_provider.hooks.consumer import KafkaConsumerHook
 from kafka_provider.shared_utils import get_callable
 
 
@@ -48,7 +48,7 @@ class AwaitMessageTrigger(BaseTrigger):
         )
 
     async def run(self):
-        consumer_hook = ConsumerHook(
+        consumer_hook = KafkaConsumerHook(
             topics=self.topics,
             kafka_conn_id=self.kafka_conn_id,
             config=self.kafka_config,

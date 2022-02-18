@@ -17,7 +17,7 @@ import pytest
 from airflow import AirflowException
 
 # Import Hook
-from kafka_provider.hooks.producer import ProducerHook
+from kafka_provider.hooks.producer import KafkaProducerHook
 
 log = logging.getLogger(__name__)
 
@@ -34,18 +34,17 @@ class TestConsumerHook(unittest.TestCase):
 
         # Standard Init
         extra_configs = {"socket.timeout.ms": 10}
-        p = ProducerHook(kafka_conn_id="kafka_sample", config=extra_configs)
-        assert not p.producer
+        KafkaProducerHook(kafka_conn_id="kafka_sample", config=extra_configs)
 
         # Too Many Args
         with pytest.raises(AirflowException):
             extra_configs = {"bootstrap.servers": "localhost:9092"}
-            p = ProducerHook(kafka_conn_id="kafka_sample", config=extra_configs)
+            KafkaProducerHook(kafka_conn_id="kafka_sample", config=extra_configs)
 
         # Not Enough Args
         with pytest.raises(AirflowException):
             extra_configs = {}
-            p = ProducerHook(config=extra_configs)
+            KafkaProducerHook(config=extra_configs)
 
 
 if __name__ == "__main__":

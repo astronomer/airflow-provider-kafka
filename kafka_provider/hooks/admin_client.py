@@ -5,16 +5,7 @@ from airflow.hooks.base import BaseHook
 from confluent_kafka.admin import AdminClient, NewTopic
 
 
-def client_required(method):
-    def inner(ref, *args, **kwargs):
-        if not hasattr(ref, "admin_client"):
-            ref.get_admin_client()
-        return method(ref, *args, **kwargs)
-
-    return inner
-
-
-class AdminClientHook(BaseHook):
+class KafkaAdminClientHook(BaseHook):
     """
     A hook to create a Kafka Producer
     """
@@ -27,36 +18,38 @@ class AdminClientHook(BaseHook):
         self.kafka_conn_id = kafka_conn_id
         self.config: Dict[Any, Any] = config or {}
 
+        self.extra_configs = {}
+
+        if self.kafka_conn_id:
+            conn = self.get_connection(self.kafka_conn_id)
+            self.extra_configs = {"bootstrap.servers": conn}
+
         if not (self.config.get("bootstrap.servers", None) or self.kafka_conn_id):
             raise AirflowException("One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
 
         if self.config.get("bootstrap.servers", None) and self.kafka_conn_id:
             raise AirflowException("One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
 
-    def get_admin_client(self) -> None:
+    def get_admin_client(self) -> AdminClient:
         """
         Returns http session to use with requests.
 
         :param headers: additional headers to be passed through as a dictionary
         :type headers: dict
         """
-        extra_configs = {}
-        if self.kafka_conn_id:
-            conn = self.get_connection(self.kafka_conn_id)
-            extra_configs = {"bootstrap.servers": conn}
 
-        self.admin_client = AdminClient({**self.config, **extra_configs})
-        return
+        return AdminClient({**self.config, **self.extra_configs})
 
-    @client_required
     def create_topic(
         self,
         topics: Sequence[Sequence[Any]],
     ) -> None:
 
+        admin_client = self.get_admin_client()
+
         new_topics = [NewTopic(t[0], num_partitions=t[1], replication_factor=t[2]) for t in topics]
 
-        futures = self.admin_client.create_topics(new_topics)
+        futures = admin_client.create_topics(new_topics)
 
         for t, f in futures.items():
             try:

@@ -5,7 +5,7 @@ from airflow.hooks.base import BaseHook
 from confluent_kafka import Producer
 
 
-class ProducerHook(BaseHook):
+class KafkaProducerHook(BaseHook):
     """
     A hook to create a Kafka Producer
     """
@@ -22,15 +22,21 @@ class ProducerHook(BaseHook):
 
         self.kafka_conn_id = kafka_conn_id
         self.config: Dict[Any, Any] = config or {}
-        self.producer = None
-        self.no_broker = no_broker
 
-        if not self.no_broker:
-            if not (self.config.get("bootstrap.servers", None) or self.kafka_conn_id):
-                raise AirflowException("One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
+        if not (self.config.get("bootstrap.servers", None) or self.kafka_conn_id):
+            raise AirflowException("One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
 
         if self.config.get("bootstrap.servers", None) and self.kafka_conn_id:
             raise AirflowException("One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
+
+        self.extra_configs = {}
+        if self.kafka_conn_id:
+            conn = self.get_connection(self.kafka_conn_id)
+            self.extra_configs = {"bootstrap.servers": conn}
+            self.log.info(
+                f"Connection ID {self.kafka_conn_id} used for bootstrap servers,"
+                + " {extra_configs} added to kafka config."
+            )
 
     def get_producer(self) -> Producer:
         """
@@ -40,16 +46,7 @@ class ProducerHook(BaseHook):
         :type headers: dict
         """
 
-        extra_configs = {}
-        if self.kafka_conn_id:
-            conn = self.get_connection(self.kafka_conn_id)
-            extra_configs = {"bootstrap.servers": conn}
-            self.log.info(
-                f"Connection ID {self.kafka_conn_id} used for bootstrap servers,"
-                + " {extra_configs} added to kafka config."
-            )
+        producer = Producer({**self.extra_configs, **self.config})
 
-        self.producer = Producer({**extra_configs, **self.config})
-
-        self.log.info(f"Producer {self.producer}")
-        return self.producer
+        self.log.info(f"Producer {producer}")
+        return producer

@@ -4,7 +4,7 @@ from typing import Any, Dict, Optional, Sequence
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
 
-from kafka_provider.hooks.consumer import ConsumerHook
+from kafka_provider.hooks.consumer import KafkaConsumerHook
 from kafka_provider.shared_utils import get_callable
 
 VALID_COMMIT_CADENCE = {"never", "end_of_batch", "end_of_operator"}
@@ -26,7 +26,6 @@ class ConsumeFromTopicOperator(BaseOperator):
         commit_cadence: Optional[str] = "end_of_operator",
         max_messages: Optional[int] = None,
         max_batch_size: int = 1000,
-        no_broker: Optional[bool] = False,
         poll_timeout: Optional[float] = 60,
         **kwargs: Any,
     ) -> None:
@@ -41,7 +40,6 @@ class ConsumeFromTopicOperator(BaseOperator):
         self.commit_cadence = commit_cadence
         self.max_messages = max_messages or True
         self.max_batch_size = max_batch_size
-        self.no_broker = no_broker
         self.poll_timeout = poll_timeout
 
         if self.commit_cadence not in VALID_COMMIT_CADENCE:
@@ -61,8 +59,8 @@ class ConsumeFromTopicOperator(BaseOperator):
 
     def execute(self, context) -> Any:
 
-        consumer = ConsumerHook(
-            topics=self.topics, kafka_conn_id=self.kafka_conn_id, config=self.config, no_broker=self.no_broker
+        consumer = KafkaConsumerHook(
+            topics=self.topics, kafka_conn_id=self.kafka_conn_id, config=self.config
         ).get_consumer()
         apply_callable = get_callable(self.apply_function)
         apply_callable = partial(apply_callable, *self.apply_function_args, **self.apply_function_kwargs)
