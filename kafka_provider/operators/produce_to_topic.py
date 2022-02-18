@@ -21,6 +21,32 @@ def acked(err, msg):
 
 
 class ProduceToTopicOperator(BaseOperator):
+    """ProduceToTopicOperator An operator that produces messages to a Kafka topic
+
+    :param topic: The topic the producer should produce to, defaults to None
+    :type topic: str, optional
+    :param producer_function: The function that generates key/value pairs as messages for production, defaults to None
+    :type producer_function: Union[str, Callable[..., Any]], optional
+    :param producer_function_args: Additional arguments to be applied to the producer callable, defaults to None
+    :type producer_function_args: Optional[Sequence[Any]], optional
+    :param producer_function_kwargs: Additional keyword arguments to be applied to the producer callable,
+        defaults to None
+    :type producer_function_kwargs: Optional[Dict[Any, Any]], optional
+    :param delivery_callback: The callback to apply after delivery(or failure) of a message, defaults to None
+    :type delivery_callback: Optional[str], optional
+    :param kafka_conn_id: The airflow connection to get brokers address from, defaults to None
+    :type kafka_conn_id: Optional[str], optional
+    :param synchronous: If writes to kafka should be fully synchronous, defaults to True
+    :type synchronous: Optional[bool], optional
+    :param kafka_config: the config dictionary for the kafka client (additional information available on the
+        confluent-python-kafka documentation), defaults to None
+    :type kafka_config: Optional[Dict[Any, Any]], optional
+    :param poll_timeout: How long of a delay should be applied when calling poll after production to kafka,
+         defaults to 0
+    :type poll_timeout: float, optional
+    :raises AirflowException: _description_
+    """
+
     def __init__(
         self,
         topic: str = None,
@@ -34,6 +60,7 @@ class ProduceToTopicOperator(BaseOperator):
         poll_timeout: float = 0,
         **kwargs: Any,
     ) -> None:
+
         super().__init__(**kwargs)
 
         if delivery_callback:

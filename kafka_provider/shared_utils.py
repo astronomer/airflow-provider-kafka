@@ -17,8 +17,22 @@ def get_callable(function_string: str) -> Callable:
 
 
 def no_op(*args, **kwargs) -> Any:
+    """no_op A function that returns its arguments
+
+    :return: whatever was passed in
+    :rtype: Any
+    """
     return args, kwargs
 
 
 def simple_producer(key, value) -> List[Tuple[Any, Any]]:
+    """simple_producer A function that returns the key,value passed in for production via "KafkaProducerOperator"
+
+    :param key: the key for the message
+    :type key: Any
+    :param value: the value for the message
+    :type value: Any
+    :return: The Key / Value pair for production via the operator
+    :rtype: List[Tuple[Any, Any]]
+    """
     return [(key, value)]

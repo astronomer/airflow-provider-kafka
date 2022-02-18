@@ -1,18 +1,15 @@
 # Kafka Airflow Provider
 
 
+
 ## Testing
 
 ### Unit Tests
 
 Unit tests are located at `tests/unit`, a kafka server isn't required to run these servers.
 
-Execute with `pytest tests/unit`.
+execute with `pytest`
 
-
-### Integration Tests
-
-Integration (functional) tests are located at `tests/integration`. A kafka server is required to run these tests. Execute the docker compose file at `tests/scripts/docker-compose.yaml` to get services up.
 
 ## Setup on M1 Mac
 Installing on M1 chip

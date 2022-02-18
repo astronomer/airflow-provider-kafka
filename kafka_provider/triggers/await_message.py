@@ -11,6 +11,38 @@ from kafka_provider.shared_utils import get_callable
 
 
 class AwaitMessageTrigger(BaseTrigger):
+    """AwaitMessageTrigger A trigger that waits for a message matching specific criteria to arrive in Kafka
+
+    The behavior of the consumer of this trigger is as follows:
+    - poll the Kafka topics for a message
+        - if no message returned, sleep
+    - process the message with provided callable and commit the message offset
+        - if callable returns any data, raise a TriggerEvent with the return data
+        - else continue to next message
+
+    :param topics: The topic (or topic regex) that should be searched for messages
+    :type topics: Sequence[str]
+    :param apply_function: the location of the function to apply to messages for determination of matching criteria.
+        (In python dot notation as a string)
+    :type apply_function: str
+    :param apply_function_args: A set of arguments to apply to the callable, defaults to None
+    :type apply_function_args: Optional[Sequence[Any]], optional
+    :param apply_function_kwargs: A set of key word arguments to apply to the callable, defaults to None,
+        defaults to None
+    :type apply_function_kwargs: Optional[Dict[Any, Any]], optional
+    :param kafka_conn_id: The airflow connection id to fetch kafka brokers from, defaults to None
+    :type kafka_conn_id: Optional[str], optional
+    :param kafka_config: the config dictionary for the kafka client (additional information available on the
+        confluent-python-kafka documentation), defaults to None
+    :type kafka_config: Optional[Dict[Any, Any]], optional
+    :param poll_timeout: How long the Kafka client should wait before returning from a poll request to
+        Kafka (seconds), defaults to 1
+    :type poll_timeout: float, optional
+    :param poll_interval: How long the the trigger should sleep after reaching the end of the Kafka log (seconds)
+        , defaults to 5
+    :type poll_interval: float, optional
+    """
+
     def __init__(
         self,
         topics: Sequence[str],
