@@ -1,5 +1,5 @@
 from functools import partial
-from typing import Any, Dict, Optional, Sequence
+from typing import Any, Callable, Dict, Optional, Sequence, Union
 
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
@@ -18,7 +18,7 @@ class ConsumeFromTopicOperator(BaseOperator):
     def __init__(
         self,
         topics: Sequence[str],
-        apply_function: str,
+        apply_function: Union[Callable[..., Any], str],
         apply_function_args: Optional[Sequence[Any]] = None,
         apply_function_kwargs: Optional[Dict[Any, Any]] = None,
         kafka_conn_id: Optional[str] = None,
@@ -62,7 +62,9 @@ class ConsumeFromTopicOperator(BaseOperator):
         consumer = KafkaConsumerHook(
             topics=self.topics, kafka_conn_id=self.kafka_conn_id, config=self.config
         ).get_consumer()
-        apply_callable = get_callable(self.apply_function)
+
+        if isinstance(self.apply_function, str):
+            apply_callable = get_callable(self.apply_function)
         apply_callable = partial(apply_callable, *self.apply_function_args, **self.apply_function_kwargs)
 
         messages_left = self.max_messages

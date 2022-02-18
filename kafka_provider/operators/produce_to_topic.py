@@ -1,6 +1,6 @@
 import logging
 from functools import partial
-from typing import Any, Dict, Optional, Sequence
+from typing import Any, Callable, Dict, Optional, Sequence, Union
 
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
@@ -24,7 +24,7 @@ class ProduceToTopicOperator(BaseOperator):
     def __init__(
         self,
         topic: str = None,
-        producer_function: str = None,
+        producer_function: Union[str, Callable[..., Any]] = None,
         producer_function_args: Optional[Sequence[Any]] = None,
         producer_function_kwargs: Optional[Dict[Any, Any]] = None,
         delivery_callback: Optional[str] = None,
@@ -44,7 +44,7 @@ class ProduceToTopicOperator(BaseOperator):
         self.kafka_conn_id = kafka_conn_id
         self.kafka_config = kafka_config
         self.topic = topic
-        self.producer_function: str = producer_function or ""
+        self.producer_function = producer_function or ""
         self.producer_function_args = producer_function_args or ()
         self.producer_function_kwargs = producer_function_kwargs or {}
         self.delivery_callback = dc
@@ -65,7 +65,10 @@ class ProduceToTopicOperator(BaseOperator):
         producer = KafkaProducerHook(
             kafka_conn_id=self.kafka_conn_id, config=self.kafka_config
         ).get_producer()
-        producer_callable = get_callable(self.producer_function)
+
+        if isinstance(self.producer_function, str):
+            producer_callable = get_callable(self.producer_function)
+
         producer_callable = partial(
             producer_callable, *self.producer_function_args, **self.producer_function_kwargs
         )
