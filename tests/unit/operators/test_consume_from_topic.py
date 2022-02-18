@@ -15,6 +15,7 @@ from unittest import mock
 
 # Import Operator
 from kafka_provider.operators.consume_from_topic import ConsumeFromTopicOperator
+from kafka_provider.shared_utils import no_op
 
 log = logging.getLogger(__name__)
 
@@ -31,6 +32,19 @@ class TestConsumeFromTopic(unittest.TestCase):
         operator = ConsumeFromTopicOperator(
             topics=["test"],
             apply_function="kafka_provider.shared_utils.no_op",
+            consumer_config={"socket.timeout.ms": 10, "group.id": "test", "bootstrap.servers": "test"},
+            task_id="test",
+            poll_timeout=0.0001,
+        )
+
+        # execute the operator (this is essentially a no op as the broker isn't setup)
+        operator.execute(context={})
+
+    def test_operator_callable(self):
+
+        operator = ConsumeFromTopicOperator(
+            topics=["test"],
+            apply_function=no_op,
             consumer_config={"socket.timeout.ms": 10, "group.id": "test", "bootstrap.servers": "test"},
             task_id="test",
             poll_timeout=0.0001,

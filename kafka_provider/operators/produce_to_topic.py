@@ -67,8 +67,9 @@ class ProduceToTopicOperator(BaseOperator):
         ).get_producer()
 
         if isinstance(self.producer_function, str):
-            producer_callable = get_callable(self.producer_function)
+            self.producer_function = get_callable(self.producer_function)
 
+        producer_callable = self.producer_function
         producer_callable = partial(
             producer_callable, *self.producer_function_args, **self.producer_function_kwargs
         )

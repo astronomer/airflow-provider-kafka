@@ -64,7 +64,9 @@ class ConsumeFromTopicOperator(BaseOperator):
         ).get_consumer()
 
         if isinstance(self.apply_function, str):
-            apply_callable = get_callable(self.apply_function)
+            self.apply_function = get_callable(self.apply_function)
+
+        apply_callable = self.apply_function
         apply_callable = partial(apply_callable, *self.apply_function_args, **self.apply_function_kwargs)
 
         messages_left = self.max_messages
