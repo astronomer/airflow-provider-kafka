@@ -96,4 +96,4 @@ class ConsumeFromTopicOperator(BaseOperator):
 
         consumer.close()
 
-        return messages_processed
+        return
