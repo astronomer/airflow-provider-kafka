@@ -10,10 +10,6 @@ Unit tests are located at `tests/unit`, a kafka server isn't required to run the
 Execute with `pytest tests/unit`.
 
 
-### Integration Tests
-
-Integration (functional) tests are located at `tests/integration`. A kafka server is required to run these tests. Execute the docker compose file at `tests/scripts/docker-compose.yaml` to get services up.
-
 ## Setup on M1 Mac
 Installing on M1 chip
 ```bash
