@@ -14,8 +14,8 @@ import unittest
 from unittest import mock
 
 # Import Operator
-from kafka_provider.operators.consume_from_topic import ConsumeFromTopicOperator
-from kafka_provider.shared_utils import no_op
+from airflow_provider_kafka.operators.consume_from_topic import ConsumeFromTopicOperator
+from airflow_provider_kafka.shared_utils import no_op
 
 log = logging.getLogger(__name__)
 
@@ -31,7 +31,7 @@ class TestConsumeFromTopic(unittest.TestCase):
 
         operator = ConsumeFromTopicOperator(
             topics=["test"],
-            apply_function="kafka_provider.shared_utils.no_op",
+            apply_function="airflow_provider_kafka.shared_utils.no_op",
             consumer_config={"socket.timeout.ms": 10, "group.id": "test", "bootstrap.servers": "test"},
             task_id="test",
             poll_timeout=0.0001,

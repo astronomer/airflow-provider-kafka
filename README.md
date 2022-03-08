@@ -9,19 +9,18 @@ Unit tests are located at `tests/unit`, a kafka server isn't required to run the
 execute with `pytest`
 
 ## Development 
+
+```
+pip install .[dev]
+```
 You can bring up the development environment with `make dev` this will spin up a complete environment (including kafka) via `docker-compose` and load the DAGs residing in the `example_dags` folder.
 
 
 ## Setup on M1 Mac
-Installing on M1 chip
+Installing on M1 chip means a brew install of the librdkafka library
 ```bash
-git clone https://github.com/edenhill/librdkafka.git
-cd librdkafka
-brew install openssl zstd pkg-config
-export CPPFLAGS="-I/opt/homebrew/opt/openssl@1.1/include"
-export LDFLAGS="-L/opt/homebrew/opt/openssl@1.1/lib"
-./configure
-make
-sudo make install
+brew install librdkafka
+export C_INCLUDE_PATH=/opt/homebrew/Cellar/librdkafka/1.8.2/include
+export LIBRARY_PATH=/opt/homebrew/Cellar/librdkafka/1.8.2/lib
 pip install confluent-kafka
 ```

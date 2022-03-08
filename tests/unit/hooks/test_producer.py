@@ -17,7 +17,7 @@ import pytest
 from airflow import AirflowException
 
 # Import Hook
-from kafka_provider.hooks.producer import KafkaProducerHook
+from airflow_provider_kafka.hooks.producer import KafkaProducerHook
 
 log = logging.getLogger(__name__)
 

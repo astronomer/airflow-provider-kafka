@@ -2,18 +2,15 @@
 # for certain features. We recognize it's a bit unclean to define these in
 # multiple places, but at this point it's the only workaround if you'd like your
 # custom conn type to show up in the Airflow UI.
+
+__version__= "0.0.0"
 def get_provider_info():
     return {
-        "package-name": "kafka_provider",  # Required
-        "name": "Airflow Kafka",  # Required
+        "package-name": "airflow-provider-kafka",  # Required
+        "name": "Airflow Provider Kafka",  # Required
         "description": "Airflow hooks and operators for Kafka",  # Required
-        "hook-class-names": [
-            "kafka.hooks.kafka_producer.KafkaProducer",
-            "kafka.hooks.kafka_consumer.KafkaConsumer",
-        ],
-        "extra-links": [],
-        "versions": ["0.0.1"],  # Required
+        "versions": [__version__],  # Required
     }
 
 
-__version__ = "0.0.0a"
+

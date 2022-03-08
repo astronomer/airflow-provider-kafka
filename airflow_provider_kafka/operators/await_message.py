@@ -2,7 +2,7 @@ from typing import Any, Dict, Optional, Sequence
 
 from airflow.models import BaseOperator
 
-from kafka_provider.triggers.await_message import AwaitMessageTrigger
+from airflow_provider_kafka.triggers.await_message import AwaitMessageTrigger
 
 VALID_COMMIT_CADENCE = {"never", "end_of_batch", "end_of_operator"}
 

@@ -4,8 +4,8 @@ from typing import Any, Callable, Dict, Optional, Sequence, Union
 from airflow.exceptions import AirflowException
 from airflow.models import BaseOperator
 
-from kafka_provider.hooks.consumer import KafkaConsumerHook
-from kafka_provider.shared_utils import get_callable
+from airflow_provider_kafka.hooks.consumer import KafkaConsumerHook
+from airflow_provider_kafka.shared_utils import get_callable
 
 VALID_COMMIT_CADENCE = {"never", "end_of_batch", "end_of_operator"}
 
@@ -81,7 +81,7 @@ class ConsumeFromTopicOperator(BaseOperator):
             )
 
         if self.max_messages and self.max_batch_size > self.max_messages:
-            self.log.warn(
+            self.log.warning(
                 f"max_batch_size ({self.max_batch_size}) > max_messages"
                 f" ({self.max_messages}). Setting max_messages to"
                 f" {self.max_batch_size}"
