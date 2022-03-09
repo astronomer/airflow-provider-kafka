@@ -19,13 +19,49 @@ jobs:
           command: |
             pip install .[dev]
             pytest -svvvrxX  --disable-pytest-warnings tests/unit
-
+  install-test:
+    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
+    # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
+    docker:
+      - image: python:3.9
+    # Add steps to the job
+    # See: https://circleci.com/docs/2.0/configuration-reference/#steps
+    steps:
+      - checkout
+      - run:
+          name: "install-test"
+          command: |
+            pip install .
+  release-test:
+    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
+    # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
+    docker:
+      - image: python:3.9
+    # Add steps to the job
+    # See: https://circleci.com/docs/2.0/configuration-reference/#steps
+    steps:
+      - checkout
+      - run:
+          name: "install-test"
+          command: |
+            pip install twine
+            echo "[distutils]" >> ~/.pypirc
+            echo "index-servers=" >> ~/.pypirc
+            echo "  testpypi" >> ~/.pypirc
+            echo "[testpypi]" >> ~/.pypirc
+            echo 'repository=https://test.pypi.org/legacy/' >> ~/.pypirc
+            echo 'username='$PYPI_USER >> ~/.pypirc
+            echo 'password='$PYPI_PASSWORD >> ~/.pypirc
+            python setup.py check sdist bdist_wheel
+            twine upload --repository testpypi dist/*
+            pip install --index-url https://test.pypi.org/simple/ angreal
+            echo "" > ~/.pypirc && rm ~/.pypirc
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
-  say-hello-workflow:
+  testing:
     jobs:
       - unit-test
-      # - install-test
+      - install-test
       # - release-test
       # - release
