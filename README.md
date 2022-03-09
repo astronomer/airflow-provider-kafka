@@ -1,6 +1,31 @@
 # Kafka Airflow Provider
 
+
+An airflow provider to: 
+- interact with kafka clusters
+- read from topics
+- write to topics
+- wait for specific messages to arrive to a topic
+
+This package currently contains
+
+3 hooks :
+- `airflow_provider_kafka.hooks.admin_client.KafkaAdminClientHook` - a hook to work against the actual kafka admin client
+- `airflow_provider_kafka.hooks.consumer.KafkaConsumerHook` - a hook that creates a computer and provides it for interaction
+- `airflow_provider_kafka.hooks.producer.KafkaProducerHook - a hook that creates a producer and provides it for interaction
+
+3 operators : 
+- `airflow_provider_kafka.operators.await_message.AwaitKafkaMessageOperator` - a deferable operator (sensor) that awaits to encounter a message in the log before triggering down stream tasks.
+- `airflow_provider_kafka.operators.consume_from_topic.ConsumeFromTopicOperator` - an operator that reads from a topic and applies a function to each message fetched. 
+- `airflow_provider_kafka.operators.produce_to_topic.ProduceToTopicOperator` - an operator that uses a iterable to produce messages as key/value pairs to a kafka topic. 
+
+1 trigger : 
+- `airflow_provider_kafka.triggers.await_message.AwaitMessageTrigger`
+
+
 ## Quick start
+
+` pip install airflow-provider-kafka`
 
 ```python 
     from airflow_provider_kafka.operators.await_message import AwaitKafkaMessageOperator
@@ -61,28 +86,6 @@
         xcom_push_key="retrieved_message",
     )
 ```
-
-An airflow provider to: 
-- interact with kafka clusters
-- read from topics
-- write to topics
-- wait for specific messages to arrive to a topic
-
-This package currently contains
-
-3 hooks :
-- `airflow_provider_kafka.hooks.admin_client.KafkaAdminClientHook` - a hook to work against the actual kafka admin client
-- `airflow_provider_kafka.hooks.consumer.KafkaConsumerHook` - a hook that creates a computer and provides it for interaction
-- `airflow_provider_kafka.hooks.producer.KafkaProducerHook - a hook that creates a producer and provides it for interaction
-
-3 operators : 
-- `airflow_provider_kafka.operators.await_message.AwaitKafkaMessageOperator` - a deferable operator (sensor) that awaits to encounter a message in the log before triggering down stream tasks.
-- `airflow_provider_kafka.operators.consume_from_topic.ConsumeFromTopicOperator` - an operator that reads from a topic and applies a function to each message fetched. 
-- `airflow_provider_kafka.operators.produce_to_topic.ProduceToTopicOperator` - an operator that uses a iterable to produce messages as key/value pairs to a kafka topic. 
-
-1 trigger : 
-- `airflow_provider_kafka.triggers.await_message.AwaitMessageTrigger`
-
 
 ## FAQs 
 
