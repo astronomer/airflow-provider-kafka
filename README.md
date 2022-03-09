@@ -92,8 +92,6 @@ This package currently contains
 
 ** Why is most of the configuration handled in a dict ? ** Because that's basically how `confluen-kafka` does it. I'd rather maintain interfaces that people already using kafka are comfortable with as a starting point - I'm happy to add more options/ interfaces in later but would prefer to be thoughtful about it to ensure that there difference between these operators and the actual client interface are minimal. 
 
-
-
 ## Development
 
 ### Unit Tests
