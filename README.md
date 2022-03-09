@@ -1,9 +1,16 @@
-# Kafka Airflow Provider
+#Kafka Airflow Provider
+
+An airflow provider to: 
+- interact with kafka clusters
+- read from topics
+- write to topics
+- wait for specific messages to arrive to a topic
 
 
 
-## Testing
-### Unit Tests
+
+##Testing
+###Unit Tests
 
 Unit tests are located at `tests/unit`, a kafka server isn't required to run these tests.
 execute with `pytest`
