@@ -84,15 +84,14 @@ workflows:
   testing:
     jobs:
       - unit-test
-      - install-test
-  release:
+      - install-test  
       - release-test:
           filters:
           # Only run on release candidate tags 
           branches:
             ignore: /.*/
           tags:
-            only: /v[0-9]+(\.[0-9]+)*(-.*)*/
+            only: /RC-[0-9]+(\.[0-9]+)*(-.*)*/
       - release:
         # Only run on semver tags
         filters:
