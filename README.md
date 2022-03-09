@@ -28,6 +28,8 @@ This package currently contains
 ` pip install airflow-provider-kafka`
 
 ```python 
+    # hello_kafka.py 
+    
     from airflow_provider_kafka.operators.await_message import AwaitKafkaMessageOperator
     from airflow_provider_kafka.operators.consume_from_topic import ConsumeFromTopicOperator
     from airflow_provider_kafka.operators.produce_to_topic import ProduceToTopicOperator
