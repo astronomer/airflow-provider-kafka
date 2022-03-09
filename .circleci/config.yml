@@ -86,16 +86,20 @@ workflows:
       - unit-test
       - install-test  
       - release-test:
+          context:
+            - github-repo
           filters:
           # Only run on release candidate tags 
-          branches:
-            ignore: /.*/
-          tags:
-            only: /RC-[0-9]+(\.[0-9]+)*(-.*)*/
+            branches:
+              ignore: /.*/
+            tags:
+              only: /RC-[0-9]+(\.[0-9]+)*(-.*)*/
       - release:
+          context:
+            - github-repo
         # Only run on semver tags
-        filters:
-          branches:
-            ignore: /.*/
-          tags:
-            only: /[0-9]+\.[0-9]+\.[0-9]+/
+          filters:
+            branches:
+              ignore: /.*/
+            tags:
+              only: /[0-9]+\.[0-9]+\.[0-9]+/
