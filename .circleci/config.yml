@@ -42,7 +42,7 @@ jobs:
     steps:
       - checkout
       - run:
-          name: "install-test"
+          name: "release-test"
           command: |
             pip install twine
             echo "[distutils]" >> ~/.pypirc
@@ -63,5 +63,5 @@ workflows:
     jobs:
       - unit-test
       - install-test
-      # - release-test
+      - release-test
       # - release
