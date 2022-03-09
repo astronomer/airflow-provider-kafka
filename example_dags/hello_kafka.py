@@ -22,14 +22,14 @@ default_args = {
 }
 
 
+
 def producer_function():
     for i in range(20):
         yield (json.dumps(i), json.dumps(i + 1))
 
 
+
 consumer_logger = logging.getLogger("airflow")
-
-
 def consumer_function(message, prefix=None):
     key = json.loads(message.key())
     value = json.loads(message.value())
