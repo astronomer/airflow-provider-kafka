@@ -54,7 +54,6 @@ jobs:
             echo 'password='$PYPI_PASSWORD >> ~/.pypirc
             python setup.py check sdist bdist_wheel
             twine upload --repository testpypi dist/*
-            pip install --index-url https://test.pypi.org/simple/ airflow-provider-kafka
             echo "" > ~/.pypirc && rm ~/.pypirc
   release:
     # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
