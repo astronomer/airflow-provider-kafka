@@ -1,14 +1,3 @@
-"""
-Unittest module to test Operators.
-
-Requires the unittest, pytest, and requests-mock Python libraries.
-
-Run test:
-
-    python3 -m unittest tests.operators.test_sample_operator.TestSampleOperator
-
-"""
-
 import logging
 import unittest
 from unittest import mock

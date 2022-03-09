@@ -1,13 +1,3 @@
-"""
-Unittest module to test Hooks.
-
-Requires the unittest, pytest, and requests-mock Python libraries.
-
-Run test:
-
-    python3 -m unittest tests.hooks.test_sample_hook.TestSampleHook
-
-"""
 
 import logging
 import unittest
