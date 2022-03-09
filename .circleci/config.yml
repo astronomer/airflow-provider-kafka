@@ -18,7 +18,7 @@ jobs:
           name: "unit-test"
           command: |
             pip install .[dev]
-            pytest -svvvrxX --cov=airflow_provider_kafka/ --cov-report=term --disable-pytest-warnings tests/unit
+            pytest -svvvrxX  --disable-pytest-warnings tests/unit
 
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
