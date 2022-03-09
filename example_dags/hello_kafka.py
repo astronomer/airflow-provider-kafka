@@ -4,10 +4,12 @@ import logging
 from datetime import datetime, timedelta
 
 from airflow import DAG
+from airflow.operators.python import PythonOperator
 
-from kafka_provider.operators.await_message import AwaitKafkaMessageOperator
-from kafka_provider.operators.consume_from_topic import ConsumeFromTopicOperator
-from kafka_provider.operators.produce_to_topic import ProduceToTopicOperator
+
+from airflow_provider_kafka.operators.await_message import AwaitKafkaMessageOperator
+from airflow_provider_kafka.operators.consume_from_topic import ConsumeFromTopicOperator
+from airflow_provider_kafka.operators.produce_to_topic import ProduceToTopicOperator
 
 default_args = {
     "owner": "airflow",
@@ -39,6 +41,9 @@ def await_function(message):
     if json.loads(message.value()) % 5 == 0:
         return f" Got the following message: {json.loads(message.value())}"
 
+def hello_kafka():
+    print("Hello Kafka !")
+    return
 
 with DAG(
     "kafka-example",
@@ -53,14 +58,16 @@ with DAG(
     t1 = ProduceToTopicOperator(
         task_id="produce_to_topic",
         topic="test_1",
-        producer_function="hello_world.producer_function",
+        producer_function="hello_kafka.producer_function",
         kafka_config={"bootstrap.servers": "broker:29092"},
     )
+
+    t1.doc_md = 'Takes a series of messages from a generator function and publishes them to the `test_1` topic of our kafka cluster.'
 
     t2 = ConsumeFromTopicOperator(
         task_id="consume_from_topic",
         topics=["test_1"],
-        apply_function="hello_world.consumer_function",
+        apply_function="hello_kafka.consumer_function",
         apply_function_kwargs={"prefix": "consumed:::"},
         consumer_config={
             "bootstrap.servers": "broker:29092",
@@ -73,12 +80,16 @@ with DAG(
         max_batch_size=2,
     )
 
+    t2.doc_md = 'Reads a series of messages from the `test_1` topic, and processes them with a consumer function with a keyword argument.'
+
     t3 = ProduceToTopicOperator(
         task_id="produce_to_topic_2",
         topic="test_1",
         producer_function=producer_function,
         kafka_config={"bootstrap.servers": "broker:29092"},
     )
+
+    t3.doc_md = 'Does the same thing as the t1 task, but passes the callable directly instead of using the string notation.'
 
     t4 = ConsumeFromTopicOperator(
         task_id="consume_from_topic_2",
@@ -95,10 +106,12 @@ with DAG(
         max_batch_size=10,
     )
 
+    t4.doc_md = 'Does the same thing as the t2 task, but passes the callable directly instead of using the string notation.'
+
     t5 = AwaitKafkaMessageOperator(
         task_id="awaiting_message",
         topics=["test_1"],
-        apply_function="hello_world.await_function",
+        apply_function="hello_kafka.await_function",
         kafka_config={
             "bootstrap.servers": "broker:29092",
             "group.id": "awaiting_message",
@@ -108,4 +121,13 @@ with DAG(
         xcom_push_key="retrieved_message",
     )
 
-    t1 >> t2 >> t3 >> t4 >> t5
+    t5.doc_md = 'A deferable task. Reads the topic `test_1` until a message with a value divisible by 5 is encountered.'
+
+    t6 = PythonOperator(
+        task_id='hello_kafka',
+        python_callable=hello_kafka
+    )
+
+    t6.doc_md = 'The task that is executed after the deferable task returns for execution.'
+    
+    t1 >> t2 >> t3 >> t4 >> t5 >> t6
