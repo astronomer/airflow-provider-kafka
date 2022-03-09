@@ -54,8 +54,30 @@ jobs:
             echo 'password='$PYPI_PASSWORD >> ~/.pypirc
             python setup.py check sdist bdist_wheel
             twine upload --repository testpypi dist/*
-            pip install --index-url https://test.pypi.org/simple/ angreal
+            pip install --index-url https://test.pypi.org/simple/ airflow-provider-kafka
             echo "" > ~/.pypirc && rm ~/.pypirc
+  release:
+    # Specify the execution environment. You can specify an image from Dockerhub or use one of our Convenience Images from CircleCI's Developer Hub.
+    # See: https://circleci.com/docs/2.0/configuration-reference/#docker-machine-macos-windows-executor
+    docker:
+      - image: python:3.9
+    # Add steps to the job
+    # See: https://circleci.com/docs/2.0/configuration-reference/#steps
+    steps:
+      - checkout
+      - run:
+          name: "release-test"
+          command: |
+            pip install twine
+            pip install .[dev]
+            echo "[server-login]" >> ~/.pypirc
+            echo "repository=https://pypi.python.org/pypi" >> ~/.pypirc
+            echo "username="$PYPI_USER >> ~/.pypirc
+            echo "password="$PYPI_PASSWORD >> ~/.pypirc
+            python setup.py check sdist bdist_wheel
+            twine upload --repository pypi dist/*
+            echo "" > ~/.pypirc && rm ~/.pypirc         
+
 # Invoke jobs via workflows
 # See: https://circleci.com/docs/2.0/configuration-reference/#workflows
 workflows:
@@ -63,5 +85,18 @@ workflows:
     jobs:
       - unit-test
       - install-test
-      - release-test
-      # - release
+  release:
+      - release-test:
+          filters:
+          # Only run on release candidate tags 
+          branches:
+            ignore: /.*/
+          tags:
+            only: /v[0-9]+(\.[0-9]+)*(-.*)*/
+      - release:
+        # Only run on semver tags
+        filters:
+          branches:
+            ignore: /.*/
+          tags:
+            only: /[0-9]+\.[0-9]+\.[0-9]+/
