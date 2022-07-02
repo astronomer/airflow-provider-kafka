@@ -46,6 +46,8 @@ class ProduceToTopicOperator(BaseOperator):
     :type poll_timeout: float, optional
     :raises AirflowException: _description_
     """
+    
+    template_fields = ('topic', 'producer_function', 'producer_function_args', 'producer_function_kwargs')
 
     def __init__(
         self,
