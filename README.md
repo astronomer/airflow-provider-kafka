@@ -11,7 +11,7 @@ This package currently contains
 
 3 hooks :
 - `airflow_provider_kafka.hooks.admin_client.KafkaAdminClientHook` - a hook to work against the actual kafka admin client
-- `airflow_provider_kafka.hooks.consumer.KafkaConsumerHook` - a hook that creates a computer and provides it for interaction
+- `airflow_provider_kafka.hooks.consumer.KafkaConsumerHook` - a hook that creates a consumer and provides it for interaction
 - `airflow_provider_kafka.hooks.producer.KafkaProducerHook` - a hook that creates a producer and provides it for interaction
 
 3 operators : 
