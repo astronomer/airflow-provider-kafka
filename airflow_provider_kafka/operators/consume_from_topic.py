@@ -20,6 +20,7 @@ class ConsumeFromTopicOperator(BaseOperator):
     :param topics: A list of topics or regex patterns the consumer should subsrcribe to.
     :type topics: Sequence[str]
     :param apply_function: The function that should be applied to all messages fetched.
+        name of dag file executing the function and the function name delimited by a `.`
     :type apply_function: Union[Callable[..., Any], str]
     :param apply_function_args: Additional arguments that should be applied to the callable, defaults to None
     :type apply_function_args: Optional[Sequence[Any]], optional
@@ -31,8 +32,10 @@ class ConsumeFromTopicOperator(BaseOperator):
     :param consumer_config: the config dictionary for the kafka client (additional information available on the
         confluent-python-kafka documentation), defaults to None, defaults to None
     :type consumer_config: Optional[Dict[Any, Any]], optional
-    :param commit_cadence: When consumers should commit offsets ("never", "end_of_batch","end_of_operator"),
-         defaults to "end_of_operator"
+    :param commit_cadence: When consumers should commit offsets ("never", "end_of_batch","end_of_operator"), defaults to "end_of_operator";
+         if end_of_operator, the commit() is called based on the max_messsages arg. Commits are made after the operator has processed the apply_function method for the maximum messages in the operator.
+         if end_of_batch, the commit() is called based on the max_batch_size arg. Commits are made after each batch has processed by the apply_function method for all messages in the batch.
+         if never,  close() is called without calling the commit() method.
     :type commit_cadence: Optional[str], optional
     :param max_messages: The maximum total number of messages an operator should read from Kafka,
          defaults to None
