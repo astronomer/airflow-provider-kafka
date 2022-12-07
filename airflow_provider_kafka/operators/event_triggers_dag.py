@@ -98,7 +98,12 @@ class EventTriggersDagOperator(BaseOperator):
 
         #Pseudo Code 
 
-        
+        for x in ("trigger_dag_id", "trigger_run_id", "conf", "reset_dag_run", "wait_for_completion", "poke_interval"):
+            if hasattr(self.trigger_dag_run_instance,x):
+                if callable(getattr(self.trigger_dag_run_instance,x)):
+                    setattr(self.trigger_dag_run_instance,x, getattr(self.trigger_dag_run_instance,x)(event))
+
+        self.trigger_dag_run_instance.execute(**context)
 
         self.defer(
             trigger=AwaitMessageTrigger(
