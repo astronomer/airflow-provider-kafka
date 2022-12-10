@@ -4,6 +4,7 @@ from airflow.models import BaseOperator
 
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 from airflow_provider_kafka.triggers.await_message import AwaitMessageTrigger
+from airflow_provider_kafka.shared_utils import get_callable
 
 VALID_COMMIT_CADENCE = {"never", "end_of_batch", "end_of_operator"}
 
@@ -102,8 +103,13 @@ class EventTriggersDagOperator(BaseOperator):
             if hasattr(self.trigger_dag_run_instance,x):
                 if callable(getattr(self.trigger_dag_run_instance,x)):
                     setattr(self.trigger_dag_run_instance,x, getattr(self.trigger_dag_run_instance,x)(event))
+                try:
+                    parameter_function = get_callable(getattr(self.trigger_dag_run_instance,x))
+                    setattr(self.trigger_dag_run_instance,x, parameter_function(event))
+                except:
+                    pass
 
-        self.trigger_dag_run_instance.execute(**context)
+        self.trigger_dag_run_instance.execute(context)
 
         self.defer(
             trigger=AwaitMessageTrigger(

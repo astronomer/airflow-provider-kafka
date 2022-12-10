@@ -55,6 +55,6 @@ with DAG(
         xcom_push_key="retrieved_message",
         trigger_dag_run_instance=TriggerDagRunOperator(
             task_id="tdro",
-            trigger_dag_id="worker_dag_general"
+            trigger_dag_id="listener_dag.pick_downstream_dag"
         )
     )
