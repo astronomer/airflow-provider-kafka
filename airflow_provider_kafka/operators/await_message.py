@@ -45,8 +45,13 @@ class AwaitKafkaMessageOperator(BaseOperator):
     BLUE = "#ffefeb"
     ui_color = BLUE
 
-    template_fields = ('topics', 'apply_function', 'apply_function_args', 'apply_function_kwargs')
-    
+    template_fields = (
+        "topics",
+        "apply_function",
+        "apply_function_args",
+        "apply_function_kwargs",
+    )
+
     def __init__(
         self,
         topics: Sequence[str],

@@ -20,12 +20,16 @@ class TestConsumerHook(unittest.TestCase):
 
         # Standard Init
         extra_configs = {"socket.timeout.ms": 10, "group.id": "test"}
-        KafkaConsumerHook(["test_1"], kafka_conn_id="kafka_sample", config=extra_configs)
+        KafkaConsumerHook(
+            ["test_1"], kafka_conn_id="kafka_sample", config=extra_configs
+        )
 
         # Too Many Args
         with pytest.raises(AirflowException):
             extra_configs = {"bootstrap.servers": "localhost:9092", "group.id": "test2"}
-            KafkaConsumerHook(["test_1"], kafka_conn_id="kafka_sample", config=extra_configs)
+            KafkaConsumerHook(
+                ["test_1"], kafka_conn_id="kafka_sample", config=extra_configs
+            )
 
         # Not Enough Args
         with pytest.raises(AirflowException):

@@ -1,4 +1,4 @@
-ARG IMAGE_NAME="quay.io/astronomer/ap-airflow:2.2.3"
+ARG IMAGE_NAME="quay.io/astronomer/ap-airflow:2.4.3"
 FROM ${IMAGE_NAME}
 
 USER root

@@ -2,7 +2,7 @@ from typing import Any, Dict, Optional, Sequence
 
 from airflow.models import BaseOperator
 
-from include.await_message import AwaitMessageTrigger
+from airflow_provider_kafka.triggers.await_message import AwaitMessageTrigger
 
 VALID_COMMIT_CADENCE = {"never", "end_of_batch", "end_of_operator"}
 
@@ -45,20 +45,24 @@ class EventTriggersFunctionOperator(BaseOperator):
     BLUE = "#ffefeb"
     ui_color = BLUE
 
-    template_fields = ('topics', 'apply_function', 'apply_function_args', 'apply_function_kwargs')
-    
+    template_fields = (
+        "topics",
+        "apply_function",
+        "apply_function_args",
+        "apply_function_kwargs",
+    )
+
     def __init__(
         self,
         topics: Sequence[str],
         apply_function: str,
-        event_triggered_function: callable, 
+        event_triggered_function: callable,
         apply_function_args: Optional[Sequence[Any]] = None,
         apply_function_kwargs: Optional[Dict[Any, Any]] = None,
         kafka_conn_id: Optional[str] = None,
         kafka_config: Optional[Dict[Any, Any]] = None,
         poll_timeout: float = 1,
         poll_interval: float = 5,
-        xcom_push_key=None,
         **kwargs: Any,
     ) -> None:
 
@@ -75,7 +79,9 @@ class EventTriggersFunctionOperator(BaseOperator):
         self.event_triggered_function = event_triggered_function
 
         if not callable(self.event_triggered_function):
-            raise TypeError(f"parameter trigger_dag_run_instance is expected to be of type TriggerDagRunOperator, got {type(event_triggered_function)}")
+            raise TypeError(
+                f"parameter trigger_dag_run_instance is expected to be of type TriggerDagRunOperator, got {type(event_triggered_function)}"
+            )
 
     def execute(self, context, event=None) -> Any:
 
@@ -94,7 +100,6 @@ class EventTriggersFunctionOperator(BaseOperator):
         )
 
         return event
-        
 
     def execute_complete(self, context, event=None):
 
@@ -113,5 +118,3 @@ class EventTriggersFunctionOperator(BaseOperator):
             ),
             method_name="execute_complete",
         )
-
-        return event

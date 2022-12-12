@@ -46,8 +46,13 @@ class ProduceToTopicOperator(BaseOperator):
     :type poll_timeout: float, optional
     :raises AirflowException: _description_
     """
-    
-    template_fields = ('topic', 'producer_function', 'producer_function_args', 'producer_function_kwargs')
+
+    template_fields = (
+        "topic",
+        "producer_function",
+        "producer_function_args",
+        "producer_function_kwargs",
+    )
 
     def __init__(
         self,
@@ -100,12 +105,16 @@ class ProduceToTopicOperator(BaseOperator):
 
         producer_callable = self.producer_function
         producer_callable = partial(
-            producer_callable, *self.producer_function_args, **self.producer_function_kwargs
+            producer_callable,
+            *self.producer_function_args,
+            **self.producer_function_kwargs,
         )
 
         # For each returned k/v in the callable : publish and flush if needed.
         for k, v in producer_callable():
-            producer.produce(self.topic, key=k, value=v, on_delivery=self.delivery_callback)
+            producer.produce(
+                self.topic, key=k, value=v, on_delivery=self.delivery_callback
+            )
             producer.poll(self.poll_timeout)
             if self.synchronous:
                 producer.flush()

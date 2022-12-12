@@ -1,24 +1,25 @@
-# listener_dag.py 
+# listener_dag.py
 
 import os
 import json
 from pendulum import datetime
 
 from airflow import DAG, Dataset
-from include.event_triggers_function import EventTriggersFunctionOperator
+from airflow_provider_kafka.operators.event_triggers_function import (
+    EventTriggersFunctionOperator,
+)
 from airflow.operators.trigger_dagrun import TriggerDagRunOperator
 
-confluent_dataset_1 = Dataset(f"confluent://{os.environ['BOOSTRAP_SERVER']}/{os.environ['KAFKA_TOPIC_NAME']}")
+from airflow.operators.python import PythonOperator
 
-my_topic = os.environ["KAFKA_TOPIC_NAME"]
+import random
+import string
 
-connection_config = {
-    "bootstrap.servers": os.environ["BOOSTRAP_SERVER"],
-    "security.protocol": "SASL_SSL",
-    "sasl.mechanism": "PLAIN",
-    "sasl.username": os.environ["KAFKA_API_KEY"],
-    "sasl.password": os.environ["KAFKA_API_SECRET"]
-}
+
+def generate_uuid():
+    letters = string.ascii_lowercase
+    return "".join(random.choice(letters) for i in range(6))
+
 
 with DAG(
     dag_id="listener_dag_function",
@@ -28,30 +29,45 @@ with DAG(
 ):
 
     def await_function(message):
-        if message is not None:
-            print(json.loads(message.value()))
-            if int(json.loads(message.value())["rating_id"]) % 2 == 0:
-                return json.loads(message.value())
+        val = json.loads(message.value())
+        print(f"Value in message is {val}")
+        if val % 3 == 0:
+            return val
+        if val % 5 == 0:
+            return val
 
     def pick_downstream_dag(message, **context):
-        print(message)
-        if message["channel"] == "web":
-            TriggerDagRunOperator(trigger_dag_id="worker_dag_web", task_id="tdr").execute(context)
-        if message["channel"] == "android":
-            TriggerDagRunOperator(trigger_dag_id="worker_dag_android", task_id="tdr").execute(context)
+        if message % 15 == 0:
+            TriggerDagRunOperator(
+                trigger_dag_id="fizz_buzz", task_id=f"{message}{generate_uuid()}"
+            ).execute(context)
         else:
-            TriggerDagRunOperator(trigger_dag_id="worker_dag_general", task_id="tdr").execute(context)
+            if message % 3 == 0:
+                print("FIZZ !")
+            if message & 5 == 0:
+                print("BUZZ !")
 
     listen_for_message = EventTriggersFunctionOperator(
-        task_id=f"listen_for_message_in_{my_topic}",
-        topics=[my_topic],
-        apply_function="listener_dag_function.await_function", #this needs to be passed in as a module, function direct does not work!!!!
+        task_id=f"listen_for_message_fizz_buzz",
+        topics=["test_1"],
+        apply_function="listener_dag_function.await_function",  # this needs to be passed in as a module, function direct does not work!!!!
         kafka_config={
-            **connection_config,
-            "group.id": "airflow_consumer_2",
-            "enable.auto.commit": True,
+            "bootstrap.servers": "broker:29092",
+            "group.id": "fizz_buzz",
+            "enable.auto.commit": False,
             "auto.offset.reset": "beginning",
         },
-        xcom_push_key="retrieved_message",
-        event_triggered_function=pick_downstream_dag
+        event_triggered_function=pick_downstream_dag,
     )
+
+with DAG(
+    dag_id="fizz_buzz",
+    start_date=datetime(2022, 11, 1),
+    schedule=None,
+    catchup=False,
+):
+
+    def hello_4():
+        print("FIZZ BUZZ")
+
+    t1 = PythonOperator(task_id="hello_kafka", python_callable=hello_4)

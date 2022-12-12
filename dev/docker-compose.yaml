@@ -5,12 +5,12 @@ x-airflow-common:
   # In order to add custom dependencies or upgrade provider packages you can use your extended image.
   # Comment the image line, place your Dockerfile in the directory where you placed the docker-compose.yaml
   # and uncomment the "build" line below, Then run `docker-compose build` to build the images.
-  image: astronomer-operators-dev
+  # image: astronomer-operators-dev
   build:
     context: ..
     dockerfile: dev/Dockerfile
     args:
-      IMAGE_NAME: ${IMAGE_NAME:-quay.io/astronomer/ap-airflow:2.2.3}
+      IMAGE_NAME: ${IMAGE_NAME:-quay.io/astronomer/ap-airflow:2.4.3}
   environment:
     &airflow-common-env
     DB_BACKEND: postgres

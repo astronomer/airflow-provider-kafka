@@ -3,7 +3,9 @@
 # multiple places, but at this point it's the only workaround if you'd like your
 # custom conn type to show up in the Airflow UI.
 
-__version__= "0.1.1"
+__version__ = "0.1.1"
+
+
 def get_provider_info():
     return {
         "package-name": "airflow-provider-kafka",  # Required
@@ -11,6 +13,3 @@ def get_provider_info():
         "description": "Airflow hooks and operators for Kafka",  # Required
         "versions": [__version__],  # Required
     }
-
-
-
