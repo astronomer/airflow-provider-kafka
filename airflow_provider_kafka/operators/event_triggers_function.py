@@ -80,7 +80,7 @@ class EventTriggersFunctionOperator(BaseOperator):
 
         if not callable(self.event_triggered_function):
             raise TypeError(
-                f"parameter trigger_dag_run_instance is expected to be of type TriggerDagRunOperator, got {type(event_triggered_function)}"
+                f"parameter event_triggered_function is expected to be of type callable, got {type(event_triggered_function)}"
             )
 
     def execute(self, context, event=None) -> Any:
