@@ -12,7 +12,11 @@ class KafkaAdminClientHook(BaseHook):
 
     default_conn_name = "kafka_default"
 
-    def __init__(self, kafka_conn_id: Optional[str] = None, config: Optional[Dict[Any, Any]] = None) -> None:
+    def __init__(
+        self,
+        kafka_conn_id: Optional[str] = None,
+        config: Optional[Dict[Any, Any]] = None,
+    ) -> None:
         super().__init__()
 
         self.kafka_conn_id = kafka_conn_id
@@ -25,10 +29,14 @@ class KafkaAdminClientHook(BaseHook):
             self.extra_configs = {"bootstrap.servers": conn}
 
         if not (self.config.get("bootstrap.servers", None) or self.kafka_conn_id):
-            raise AirflowException("One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
+            raise AirflowException(
+                "One of config['bootsrap.servers'] or kafka_conn_id must be provided."
+            )
 
         if self.config.get("bootstrap.servers", None) and self.kafka_conn_id:
-            raise AirflowException("One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
+            raise AirflowException(
+                "One of config['bootsrap.servers'] or kafka_conn_id must be provided."
+            )
 
     def get_admin_client(self) -> AdminClient:
         """
@@ -47,7 +55,9 @@ class KafkaAdminClientHook(BaseHook):
 
         admin_client = self.get_admin_client()
 
-        new_topics = [NewTopic(t[0], num_partitions=t[1], replication_factor=t[2]) for t in topics]
+        new_topics = [
+            NewTopic(t[0], num_partitions=t[1], replication_factor=t[2]) for t in topics
+        ]
 
         futures = admin_client.create_topics(new_topics)
 

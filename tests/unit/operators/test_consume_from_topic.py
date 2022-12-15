@@ -21,7 +21,11 @@ class TestConsumeFromTopic(unittest.TestCase):
         operator = ConsumeFromTopicOperator(
             topics=["test"],
             apply_function="airflow_provider_kafka.shared_utils.no_op",
-            consumer_config={"socket.timeout.ms": 10, "group.id": "test", "bootstrap.servers": "test"},
+            consumer_config={
+                "socket.timeout.ms": 10,
+                "group.id": "test",
+                "bootstrap.servers": "test",
+            },
             task_id="test",
             poll_timeout=0.0001,
         )
@@ -34,7 +38,11 @@ class TestConsumeFromTopic(unittest.TestCase):
         operator = ConsumeFromTopicOperator(
             topics=["test"],
             apply_function=no_op,
-            consumer_config={"socket.timeout.ms": 10, "group.id": "test", "bootstrap.servers": "test"},
+            consumer_config={
+                "socket.timeout.ms": 10,
+                "group.id": "test",
+                "bootstrap.servers": "test",
+            },
             task_id="test",
             poll_timeout=0.0001,
         )

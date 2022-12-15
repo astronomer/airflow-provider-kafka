@@ -30,10 +30,14 @@ class KafkaConsumerHook(BaseHook):
             )
 
         if not (self.config.get("bootstrap.servers", None) or self.kafka_conn_id):
-            raise AirflowException("One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
+            raise AirflowException(
+                "One of config['bootsrap.servers'] or kafka_conn_id must be provided."
+            )
 
         if self.config.get("bootstrap.servers", None) and self.kafka_conn_id:
-            raise AirflowException("One of config['bootsrap.servers'] or kafka_conn_id must be provided.")
+            raise AirflowException(
+                "One of config['bootsrap.servers'] or kafka_conn_id must be provided."
+            )
 
         self.extra_configs = {}
         if self.kafka_conn_id:

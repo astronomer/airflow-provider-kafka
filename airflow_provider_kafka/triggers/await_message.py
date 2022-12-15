@@ -93,7 +93,9 @@ class AwaitMessageTrigger(BaseTrigger):
         async_commit = sync_to_async(consumer.commit)
 
         processing_call = get_callable(self.apply_function)
-        processing_call = partial(processing_call, *self.apply_function_args, **self.apply_function_kwargs)
+        processing_call = partial(
+            processing_call, *self.apply_function_args, **self.apply_function_kwargs
+        )
         async_message_process = sync_to_async(processing_call)
         while True:
 

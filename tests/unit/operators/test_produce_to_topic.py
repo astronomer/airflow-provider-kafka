@@ -20,7 +20,11 @@ class TestProduceToTopic(unittest.TestCase):
             producer_function="airflow_provider_kafka.shared_utils.simple_producer",
             producer_function_args=(b"test", b"test"),
             task_id="test",
-            kafka_config={"socket.timeout.ms": 10, "message.timeout.ms": 10, "bootstrap.servers": "test"},
+            kafka_config={
+                "socket.timeout.ms": 10,
+                "message.timeout.ms": 10,
+                "bootstrap.servers": "test",
+            },
             synchronous=False,
         )
 

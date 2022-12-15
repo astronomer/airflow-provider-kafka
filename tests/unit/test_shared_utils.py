@@ -8,6 +8,8 @@ def test_get_callable():
 
 
 def test_simple_producer():
-    func_as_callable = get_callable("airflow_provider_kafka.shared_utils.simple_producer")
+    func_as_callable = get_callable(
+        "airflow_provider_kafka.shared_utils.simple_producer"
+    )
     rv = func_as_callable(42, 42)
     assert rv == [(42, 42)]

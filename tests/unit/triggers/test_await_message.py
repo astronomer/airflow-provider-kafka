@@ -18,7 +18,9 @@ def test_trigger_serialization():
 
     classpath, kwargs = trigger.serialize()
 
-    assert classpath == "airflow_provider_kafka.triggers.await_message.AwaitMessageTrigger"
+    assert (
+        classpath == "airflow_provider_kafka.triggers.await_message.AwaitMessageTrigger"
+    )
     assert kwargs == dict(
         apply_function="test.noop",
         topics="noop",

@@ -7,7 +7,7 @@ from airflow_provider_kafka.triggers.await_message import AwaitMessageTrigger
 VALID_COMMIT_CADENCE = {"never", "end_of_batch", "end_of_operator"}
 
 
-class AwaitKafkaMessageOperator(BaseOperator):
+class EventTriggersFunctionOperator(BaseOperator):
     """AwaitKafkaMessageOperator An Airflow operator that defers until a specific message is published to Kafka.
 
     The behavior of the consumer for this trigger is as follows:
@@ -56,13 +56,13 @@ class AwaitKafkaMessageOperator(BaseOperator):
         self,
         topics: Sequence[str],
         apply_function: str,
+        event_triggered_function: callable,
         apply_function_args: Optional[Sequence[Any]] = None,
         apply_function_kwargs: Optional[Dict[Any, Any]] = None,
         kafka_conn_id: Optional[str] = None,
         kafka_config: Optional[Dict[Any, Any]] = None,
         poll_timeout: float = 1,
         poll_interval: float = 5,
-        xcom_push_key=None,
         **kwargs: Any,
     ) -> None:
 
@@ -76,9 +76,14 @@ class AwaitKafkaMessageOperator(BaseOperator):
         self.kafka_config = kafka_config
         self.poll_timeout = poll_timeout
         self.poll_interval = poll_interval
-        self.xcom_push_key = xcom_push_key
+        self.event_triggered_function = event_triggered_function
 
-    def execute(self, context) -> Any:
+        if not callable(self.event_triggered_function):
+            raise TypeError(
+                f"parameter event_triggered_function is expected to be of type callable, got {type(event_triggered_function)}"
+            )
+
+    def execute(self, context, event=None) -> Any:
 
         self.defer(
             trigger=AwaitMessageTrigger(
@@ -94,7 +99,22 @@ class AwaitKafkaMessageOperator(BaseOperator):
             method_name="execute_complete",
         )
 
-    def execute_complete(self, context, event=None):
-        if self.xcom_push_key:
-            self.xcom_push(context, key=self.xcom_push_key, value=event)
         return event
+
+    def execute_complete(self, context, event=None):
+
+        self.event_triggered_function(event, **context)
+
+        self.defer(
+            trigger=AwaitMessageTrigger(
+                topics=self.topics,
+                apply_function=self.apply_function,
+                apply_function_args=self.apply_function_args,
+                apply_function_kwargs=self.apply_function_kwargs,
+                kafka_conn_id=self.kafka_conn_id,
+                kafka_config=self.kafka_config,
+                poll_timeout=self.poll_timeout,
+                poll_interval=self.poll_interval,
+            ),
+            method_name="execute_complete",
+        )

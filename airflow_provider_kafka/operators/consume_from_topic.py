@@ -49,7 +49,13 @@ class ConsumeFromTopicOperator(BaseOperator):
 
     BLUE = "#ffefeb"
     ui_color = BLUE
-    template_fields = ('topics', 'apply_function', 'apply_function_args', 'apply_function_kwargs')
+    template_fields = (
+        "topics",
+        "apply_function",
+        "apply_function_args",
+        "apply_function_kwargs",
+    )
+
     def __init__(
         self,
         topics: Sequence[str],
@@ -103,7 +109,9 @@ class ConsumeFromTopicOperator(BaseOperator):
             self.apply_function = get_callable(self.apply_function)
 
         apply_callable = self.apply_function
-        apply_callable = partial(apply_callable, *self.apply_function_args, **self.apply_function_kwargs)
+        apply_callable = partial(
+            apply_callable, *self.apply_function_args, **self.apply_function_kwargs
+        )
 
         messages_left = self.max_messages
         messages_processed = 0
@@ -111,7 +119,11 @@ class ConsumeFromTopicOperator(BaseOperator):
         while messages_left > 0:  # bool(True > 0) == True
 
             if not isinstance(messages_left, bool):
-                batch_size = self.max_batch_size if messages_left > self.max_batch_size else messages_left
+                batch_size = (
+                    self.max_batch_size
+                    if messages_left > self.max_batch_size
+                    else messages_left
+                )
             else:
                 batch_size = self.max_batch_size
 
