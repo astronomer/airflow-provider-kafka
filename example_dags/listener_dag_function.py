@@ -1,10 +1,9 @@
 # listener_dag_function.py
 
-import os
 import json
 from pendulum import datetime
 
-from airflow import DAG, Dataset
+from airflow import DAG
 from airflow_provider_kafka.operators.event_triggers_function import (
     EventTriggersFunctionOperator,
 )
@@ -48,7 +47,7 @@ with DAG(
                 print("BUZZ !")
 
     listen_for_message = EventTriggersFunctionOperator(
-        task_id=f"listen_for_message_fizz_buzz",
+        task_id="listen_for_message_fizz_buzz",
         topics=["test_1"],
         apply_function="listener_dag_function.await_function",  # this needs to be passed in as a module, function direct does not work!!!!
         kafka_config={
