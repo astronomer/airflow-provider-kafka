@@ -52,6 +52,7 @@ class ProduceToTopicOperator(BaseOperator):
         "producer_function",
         "producer_function_args",
         "producer_function_kwargs",
+        "kafka_config",
     )
 
     def __init__(
