@@ -50,6 +50,7 @@ class EventTriggersFunctionOperator(BaseOperator):
         "apply_function",
         "apply_function_args",
         "apply_function_kwargs",
+        "kafka_config",
     )
 
     def __init__(

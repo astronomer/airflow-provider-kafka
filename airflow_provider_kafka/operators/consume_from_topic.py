@@ -54,6 +54,7 @@ class ConsumeFromTopicOperator(BaseOperator):
         "apply_function",
         "apply_function_args",
         "apply_function_kwargs",
+        "consumer_config",
     )
 
     def __init__(
