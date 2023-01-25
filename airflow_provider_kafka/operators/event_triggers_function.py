@@ -8,7 +8,7 @@ VALID_COMMIT_CADENCE = {"never", "end_of_batch", "end_of_operator"}
 
 
 class EventTriggersFunctionOperator(BaseOperator):
-    """AwaitKafkaMessageOperator An Airflow operator that defers until a specific message is published to Kafka.
+    """EventTriggersFunctionOperator An Airflow operator that defers until a specific message is published to Kafka, then triggers a registered function
 
     The behavior of the consumer for this trigger is as follows:
     - poll the Kafka topics for a message
@@ -20,9 +20,11 @@ class EventTriggersFunctionOperator(BaseOperator):
 
     :param topics: Topics (or topic regex) to use for reading from
     :type topics: Sequence[str]
-    :param apply_function: The functoin to apply to messages to determine if an event occurred. As a dot
+    :param apply_function: The function to apply to messages to determine if an event occurred. As a dot
     notation string.
     :type apply_function: str
+    :param event_triggered_function: The callable to trigger once the apply_function encounters a positive event.
+    :type event_triggered_function: callable
     :param apply_function_args: Arguments to be applied to the processing function, defaults to None
     :type apply_function_args: Optional[Sequence[Any]], optional
     :param apply_function_kwargs: Key word arguments to be applied to the processing function,, defaults to None
@@ -40,6 +42,8 @@ class EventTriggersFunctionOperator(BaseOperator):
     :type poll_interval: float, optional
     :param xcom_push_key: the name of a key to push the returned message to, defaults to None
     :type xcom_push_key: _type_, optional
+
+
     """
 
     BLUE = "#ffefeb"

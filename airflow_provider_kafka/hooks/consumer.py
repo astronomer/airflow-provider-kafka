@@ -6,8 +6,14 @@ from confluent_kafka import Consumer
 
 
 class KafkaConsumerHook(BaseHook):
-    """
-    A hook to create a Kafka Producer
+    """KafkaConsumerHook
+
+    A hook for creating a Kafka Consumer
+
+    :param kafka_conn_id: A connection id to use for connecting to the cluster, defaults to None
+    :type kafka_conn_id: Optional[str], optional
+    :param config: A config dictionary to use with confluent_kafka library, defaults to None
+    :type config: Optional[Dict[Any, Any]], optional
     """
 
     default_conn_name = "kafka_default"

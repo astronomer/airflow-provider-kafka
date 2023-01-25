@@ -6,9 +6,16 @@ from confluent_kafka import Producer
 
 
 class KafkaProducerHook(BaseHook):
+    """KafkaProducerHook
+
+    A hook for creating a Kafka Producer
+
+    :param kafka_conn_id: A connection id to use for connecting to the cluster, defaults to None
+    :type kafka_conn_id: Optional[str], optional
+    :param config: A config dictionary to use with confluent_kafka library, defaults to None
+    :type config: Optional[Dict[Any, Any]], optional
     """
-    A hook to create a Kafka Producer
-    """
+
 
     default_conn_name = "kafka_default"
 

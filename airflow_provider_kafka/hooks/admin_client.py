@@ -6,10 +6,15 @@ from confluent_kafka.admin import AdminClient, NewTopic
 
 
 class KafkaAdminClientHook(BaseHook):
-    """
-    A hook to create a Kafka Producer
-    """
+    """KafkaAdminClientHook
 
+    A hook for interacting with the Kafka Cluster
+
+    :param kafka_conn_id: A connection id to use for connecting to the cluster, defaults to None
+    :type kafka_conn_id: Optional[str], optional
+    :param config: A config dictionary to use with confluent_kafka library, defaults to None
+    :type config: Optional[Dict[Any, Any]], optional
+    """
     default_conn_name = "kafka_default"
 
     def __init__(
@@ -39,19 +44,22 @@ class KafkaAdminClientHook(BaseHook):
             )
 
     def get_admin_client(self) -> AdminClient:
-        """
-        Returns http session to use with requests.
+        """returns an AdminClient for communicating with the cluster
 
-        :param headers: additional headers to be passed through as a dictionary
-        :type headers: dict
+        :return: _description_
+        :rtype: AdminClient
         """
-
         return AdminClient({**self.config, **self.extra_configs})
 
     def create_topic(
         self,
         topics: Sequence[Sequence[Any]],
     ) -> None:
+        """creates a topic
+
+        :param topics: a list of topics to create
+        :type topics: Sequence[Sequence[Any]]
+        """
 
         admin_client = self.get_admin_client()
 
