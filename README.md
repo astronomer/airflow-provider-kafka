@@ -11,19 +11,19 @@ An airflow provider to:
 
 This package currently contains
 
-3 hooks :
-- `airflow_provider_kafka.hooks.admin_client.KafkaAdminClientHook` - a hook to work against the actual kafka admin client
-- `airflow_provider_kafka.hooks.consumer.KafkaConsumerHook` - a hook that creates a consumer and provides it for interaction
-- `airflow_provider_kafka.hooks.producer.KafkaProducerHook` - a hook that creates a producer and provides it for interaction
+3 hooks (`airflow_provider_kafka.hooks`) :
+- `admin_client.KafkaAdminClientHook` - a hook to work against the actual kafka admin client
+- `consumer.KafkaConsumerHook` - a hook that creates a consumer and provides it for interaction
+- `producer.KafkaProducerHook` - a hook that creates a producer and provides it for interaction
 
-4 operators : 
-- `airflow_provider_kafka.operators.await_message.AwaitKafkaMessageOperator` - a deferable operator (sensor) that awaits to encounter a message in the log before triggering down stream tasks.
-- `airflow_provider_kafka.operators.consume_from_topic.ConsumeFromTopicOperator` - an operator that reads from a topic and applies a function to each message fetched. 
-- `airflow_provider_kafka.operators.produce_to_topic.ProduceToTopicOperator` - an operator that uses a iterable to produce messages as key/value pairs to a kafka topic. 
-- `airflow_provider_kafka.operators.event_triggers_function.EventTriggersFunctionOperator` - an operator that listens for messages on the topic and then triggers a downstream function before going back to listening.
+4 operators (`airflow_provider_kafka.operators`) : 
+- `await_message.AwaitKafkaMessageOperator` - a deferable operator (sensor) that awaits to encounter a message in the log before triggering down stream tasks.
+- `consume_from_topic.ConsumeFromTopicOperator` - an operator that reads from a topic and applies a function to each message fetched. 
+- `produce_to_topic.ProduceToTopicOperator` - an operator that uses a iterable to produce messages as key/value pairs to a kafka topic. 
+- `event_triggers_function.EventTriggersFunctionOperator` - an operator that listens for messages on the topic and then triggers a downstream function before going back to listening.
 
-1 trigger : 
-- `airflow_provider_kafka.triggers.await_message.AwaitMessageTrigger`
+1 trigger `airflow_provider_kafka.triggers` : 
+- `await_message.AwaitMessageTrigger`
 
 
 ## Quick start
