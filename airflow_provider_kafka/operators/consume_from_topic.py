@@ -54,13 +54,14 @@ class ConsumeFromTopicOperator(BaseOperator):
         "apply_function",
         "apply_function_args",
         "apply_function_kwargs",
-        "consumer_config",
+        "config",
     )
 
     def __init__(
         self,
         topics: Sequence[str],
-        apply_function: Union[Callable[..., Any], str],
+        apply_function: Union[Callable[..., Any], str] = None,
+        apply_function_batch: Union[Callable[..., Any], str] = None,
         apply_function_args: Optional[Sequence[Any]] = None,
         apply_function_kwargs: Optional[Dict[Any, Any]] = None,
         kafka_conn_id: Optional[str] = None,
@@ -75,7 +76,8 @@ class ConsumeFromTopicOperator(BaseOperator):
         super().__init__(**kwargs)
 
         self.topics = topics
-        self.apply_function = apply_function
+        self.apply_function = apply_function or None
+        self.apply_function_batch = apply_function_batch or None
         self.apply_function_args = apply_function_args or ()
         self.apply_function_kwargs = apply_function_kwargs or {}
         self.kafka_conn_id = kafka_conn_id
@@ -100,6 +102,11 @@ class ConsumeFromTopicOperator(BaseOperator):
         if self.commit_cadence == "never":
             self.commit_cadence = None
 
+        if apply_function and apply_function_batch:
+            raise AirflowException(
+                "One of apply_function or apply_function_batch must be supplied, not both."
+            )
+
     def execute(self, context) -> Any:
 
         consumer = KafkaConsumerHook(
@@ -109,10 +116,20 @@ class ConsumeFromTopicOperator(BaseOperator):
         if isinstance(self.apply_function, str):
             self.apply_function = get_callable(self.apply_function)
 
-        apply_callable = self.apply_function
-        apply_callable = partial(
-            apply_callable, *self.apply_function_args, **self.apply_function_kwargs
-        )
+        if isinstance(self.apply_function_batch, str):
+            self.apply_function_batch = get_callable(self.apply_function_batch)
+
+        if self.apply_function:
+            apply_callable = self.apply_function
+            apply_callable = partial(
+                apply_callable, *self.apply_function_args, **self.apply_function_kwargs
+            )
+
+        if self.apply_function_batch:
+            apply_callable = self.apply_function_batch
+            apply_callable = partial(
+                apply_callable, *self.apply_function_args, **self.apply_function_kwargs
+            )
 
         messages_left = self.max_messages
         messages_processed = 0
@@ -136,8 +153,12 @@ class ConsumeFromTopicOperator(BaseOperator):
                 self.log.info("Reached end of log. Exiting.")
                 break
 
-            for m in msgs:
-                apply_callable(m)
+            if self.apply_function:
+                for m in msgs:
+                    apply_callable(m)
+
+            if self.apply_function_batch:
+                apply_callable(msgs)
 
             if self.commit_cadence == "end_of_batch":
                 self.log.info(f"committing offset at {self.commit_cadence}")

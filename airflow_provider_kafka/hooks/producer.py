@@ -16,7 +16,6 @@ class KafkaProducerHook(BaseHook):
     :type config: Optional[Dict[Any, Any]], optional
     """
 
-
     default_conn_name = "kafka_default"
 
     def __init__(
