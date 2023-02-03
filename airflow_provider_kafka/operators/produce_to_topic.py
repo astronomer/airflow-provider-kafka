@@ -25,7 +25,7 @@ class ProduceToTopicOperator(BaseOperator):
 
     Registers a producer to a kafka topic and publishes messages to the log.
 
-    
+
     :param topic: The topic the producer should produce to, defaults to None
     :type topic: str, optional
     :param producer_function: The function that generates key/value pairs as messages for production, defaults to None

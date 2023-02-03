@@ -39,6 +39,16 @@ def consumer_function(message, prefix=None):
     return
 
 
+def consumer_function_batch(messages, prefix=None):
+    for message in messages:
+        key = json.loads(message.key())
+        value = json.loads(message.value())
+        consumer_logger.info(
+            f"{prefix} {message.topic()} @ {message.offset()}; {key} : {value}"
+        )
+    return
+
+
 def await_function(message):
     if json.loads(message.value()) % 5 == 0:
         return f" Got the following message: {json.loads(message.value())}"
@@ -110,6 +120,23 @@ with DAG(
         max_batch_size=10,
     )
 
+    t4b = ConsumeFromTopicOperator(
+        task_id="consume_from_topic_2b",
+        topics=["test_1"],
+        apply_function_batch=functools.partial(
+            consumer_function_batch, prefix="consumed:::"
+        ),
+        consumer_config={
+            "bootstrap.servers": "broker:29092",
+            "group.id": "foo2",
+            "enable.auto.commit": False,
+            "auto.offset.reset": "beginning",
+        },
+        commit_cadence="end_of_batch",
+        max_messages=30,
+        max_batch_size=10,
+    )
+
     t4.doc_md = "Does the same thing as the t2 task, but passes the callable directly instead of using the string notation."
 
     t5 = AwaitKafkaMessageOperator(
@@ -133,4 +160,4 @@ with DAG(
         "The task that is executed after the deferable task returns for execution."
     )
 
-    t1 >> t2 >> t3 >> t4 >> t5 >> t6
+    t1 >> t2 >> t3 >> [t4, t4b] >> t5 >> t6
