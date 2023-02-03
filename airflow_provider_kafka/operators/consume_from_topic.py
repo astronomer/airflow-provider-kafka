@@ -19,9 +19,13 @@ class ConsumeFromTopicOperator(BaseOperator):
 
     :param topics: A list of topics or regex patterns the consumer should subsrcribe to.
     :type topics: Sequence[str]
-    :param apply_function: The function that should be applied to all messages fetched.
+    :param apply_function: The function that should be applied to fetched one at a time.
         name of dag file executing the function and the function name delimited by a `.`
     :type apply_function: Union[Callable[..., Any], str]
+    :param apply_function_batch: The function that should be applied to a batch of messages fetched. Can not
+        be used with `apply_function`. Intended for transactional workloads where an expensive task might
+        be called before or after operations on the messages are taken. 
+    :type apply_function_batch: Union[Callable[..., Any], str]
     :param apply_function_args: Additional arguments that should be applied to the callable, defaults to None
     :type apply_function_args: Optional[Sequence[Any]], optional
     :param apply_function_kwargs: Additional key word arguments that should be applied to the callable
