@@ -77,4 +77,3 @@ class KafkaAdminClientHook(BaseHook):
             except Exception as e:
                 if e.args[0].name() == "TOPIC_ALREADY_EXISTS":
                     self.log.warning(f"The topic {t} already exists.")
-                    pass

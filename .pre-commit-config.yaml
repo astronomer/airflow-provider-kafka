@@ -1,9 +1,10 @@
 repos:
-  - repo: https://github.com/psf/black
-    rev: 21.12b0
+  - repo: https://github.com/charliermarsh/ruff-pre-commit
+    # Ruff version.
+    rev: 'v0.0.245'
     hooks:
-      - id: black
-        args: ["--target-version=py37", "--line-length=110"]
+      - id: ruff
+        args: [--fix-only]
 
   - repo: https://github.com/pycqa/isort
     rev: 5.10.1
@@ -11,10 +12,10 @@ repos:
       - id: isort
         args: ["--profile=black"]
 
-  - repo: https://gitlab.com/pycqa/flake8
-    rev: 3.9.2
+  - repo: https://github.com/PyCQA/autoflake
+    rev: v2.0.1
     hooks:
-      - id: flake8
+    -   id: autoflake
 
   - repo: https://github.com/pre-commit/pre-commit-hooks
     rev: v4.1.0

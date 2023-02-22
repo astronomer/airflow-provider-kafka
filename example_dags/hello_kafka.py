@@ -6,7 +6,6 @@ from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 
-
 from airflow_provider_kafka.operators.await_message import AwaitKafkaMessageOperator
 from airflow_provider_kafka.operators.consume_from_topic import ConsumeFromTopicOperator
 from airflow_provider_kafka.operators.produce_to_topic import ProduceToTopicOperator

@@ -1,4 +1,4 @@
-from typing import Any, Dict, Optional, Sequence
+from typing import Any, Callable, Dict, Optional, Sequence
 
 from airflow.models import BaseOperator
 
@@ -61,7 +61,7 @@ class EventTriggersFunctionOperator(BaseOperator):
         self,
         topics: Sequence[str],
         apply_function: str,
-        event_triggered_function: callable,
+        event_triggered_function: Callable,
         apply_function_args: Optional[Sequence[Any]] = None,
         apply_function_kwargs: Optional[Dict[Any, Any]] = None,
         kafka_conn_id: Optional[str] = None,

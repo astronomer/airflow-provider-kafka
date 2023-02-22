@@ -1,5 +1,6 @@
 ---
 version: '3'
+name: airflow-provider-kafka
 x-airflow-common:
   &airflow-common
   # In order to add custom dependencies or upgrade provider packages you can use your extended image.
@@ -25,8 +26,7 @@ x-airflow-common:
     ASTRONOMER_ENVIRONMENT: local
   volumes:
     - ../example_dags:/usr/local/airflow/dags
-    - ./logs:/usr/local/airflow/logs
-    - ../kafka_provider:/usr/local/airflow/kafka_provider
+    - logs:/usr/local/airflow/logs
   depends_on:
     &airflow-common-depends-on
     redis:
@@ -218,3 +218,4 @@ services:
       KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
 volumes:
   postgres-db-volume:
+  logs:
