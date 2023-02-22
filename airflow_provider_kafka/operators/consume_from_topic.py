@@ -8,7 +8,7 @@ from airflow_provider_kafka.hooks.consumer import KafkaConsumerHook
 from airflow_provider_kafka.shared_utils import get_callable
 
 VALID_COMMIT_CADENCE = {"never", "end_of_batch", "end_of_operator"}
-
+x = "asdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdfasdf"
 
 class ConsumeFromTopicOperator(BaseOperator):
     """ConsumeFromTopicOperator An operator that consumes from Kafka a topic(s) and processing the messages.
@@ -24,7 +24,7 @@ class ConsumeFromTopicOperator(BaseOperator):
     :type apply_function: Union[Callable[..., Any], str]
     :param apply_function_batch: The function that should be applied to a batch of messages fetched. Can not
         be used with `apply_function`. Intended for transactional workloads where an expensive task might
-        be called before or after operations on the messages are taken. 
+        be called before or after operations on the messages are taken.
     :type apply_function_batch: Union[Callable[..., Any], str]
     :param apply_function_args: Additional arguments that should be applied to the callable, defaults to None
     :type apply_function_args: Optional[Sequence[Any]], optional
@@ -63,9 +63,9 @@ class ConsumeFromTopicOperator(BaseOperator):
 
     def __init__(
         self,
-        topics: Sequence[str],
-        apply_function: Union[Callable[..., Any], str] = None,
-        apply_function_batch: Union[Callable[..., Any], str] = None,
+        topics: Union[str,Sequence[str]],
+        apply_function: Optional[Union[Callable[..., Any], str]] =None,
+        apply_function_batch: Optional[Union[Callable[..., Any], str]] = None,
         apply_function_args: Optional[Sequence[Any]] = None,
         apply_function_kwargs: Optional[Dict[Any, Any]] = None,
         kafka_conn_id: Optional[str] = None,

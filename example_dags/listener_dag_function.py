@@ -1,18 +1,17 @@
 # listener_dag_function.py
 
 import json
-from pendulum import datetime
+import random
+import string
 
 from airflow import DAG
+from airflow.operators.python import PythonOperator
+from airflow.operators.trigger_dagrun import TriggerDagRunOperator
+from pendulum import datetime
+
 from airflow_provider_kafka.operators.event_triggers_function import (
     EventTriggersFunctionOperator,
 )
-from airflow.operators.trigger_dagrun import TriggerDagRunOperator
-
-from airflow.operators.python import PythonOperator
-
-import random
-import string
 
 
 def generate_uuid():
@@ -37,14 +36,15 @@ with DAG(
 
     def pick_downstream_dag(message, **context):
         if message % 15 == 0:
+            print(f"encountered {message} - executing external dag!")
             TriggerDagRunOperator(
                 trigger_dag_id="fizz_buzz", task_id=f"{message}{generate_uuid()}"
             ).execute(context)
         else:
             if message % 3 == 0:
-                print("FIZZ !")
+                print(f"encountered {message} FIZZ !")
             if message & 5 == 0:
-                print("BUZZ !")
+                print(f"encountered {message} BUZZ !")
 
     listen_for_message = EventTriggersFunctionOperator(
         task_id="listen_for_message_fizz_buzz",

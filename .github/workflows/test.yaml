@@ -1,0 +1,82 @@
+name: Testing
+
+on:
+  push:
+    branches: [main,master]
+  pull_request:
+    branches: [main,master]
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
+  cancel-in-progress: true
+env:
+  FORCE_COLOR: "1" # Make tools pretty.
+  PIP_DISABLE_PIP_VERSION_CHECK: "1"
+  PIP_NO_PYTHON_VERSION_WARNING: "1"
+  SETUPTOOLS_SCM_PRETEND_VERSION: "1.0" # avoid warnings about shallow checkout
+  PYTHON_LATEST: "3.11"
+
+
+jobs:
+  tests:
+    name: tests on ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: true
+      matrix:
+        python-version:
+          - "3.7"
+          - "3.8"
+          - "3.9"
+          - "3.10"
+          - "3.11"
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+
+      - name: unit tests
+        run: |
+          python -VV
+          python -m site
+          python -m pip install --upgrade pip setuptools wheel angreal
+          angreal dev-setup
+          angreal run-tests
+  mypy:
+    name: mypy on ${{ matrix.python-version }}
+    runs-on: ubuntu-latest
+    strategy:
+      fail-fast: false
+      matrix:
+        python-version:
+          - "3.7"
+          - "3.8"
+          - "3.9"
+          - "3.10"
+          - "3.11"
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{ matrix.python-version }}
+      - name: static tests
+        run: |
+          pip install .[dev]
+          angreal dev-setup
+          angreal static-tests
+
+  install-dev:
+    name: Verify dev env
+    runs-on: ${{ matrix.os }}
+    strategy:
+      matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
+    steps:
+      - uses: actions/checkout@v3
+      - uses: actions/setup-python@v4
+        with:
+          python-version: ${{env.PYTHON_LATEST}}
+      - name: install and test import
+        run: |
+          python -m pip install -e .
+          python -c 'import airflow_provider_kafka; print(airflow_provider_kafka.__version__)'

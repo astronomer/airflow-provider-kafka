@@ -3,7 +3,7 @@
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/astronomer/airflow-provider-kafka)![PyPI](https://img.shields.io/pypi/v/airflow-provider-kafka)![PyPI - Downloads](https://img.shields.io/pypi/dm/airflow-provider-kafka)
 
 
-An airflow provider to: 
+An airflow provider to:
 - interact with kafka clusters
 - read from topics
 - write to topics
@@ -16,31 +16,33 @@ This package currently contains
 - `consumer.KafkaConsumerHook` - a hook that creates a consumer and provides it for interaction
 - `producer.KafkaProducerHook` - a hook that creates a producer and provides it for interaction
 
-4 operators (`airflow_provider_kafka.operators`) : 
+4 operators (`airflow_provider_kafka.operators`) :
 - `await_message.AwaitKafkaMessageOperator` - a deferable operator (sensor) that awaits to encounter a message in the log before triggering down stream tasks.
-- `consume_from_topic.ConsumeFromTopicOperator` - an operator that reads from a topic and applies a function to each message fetched. 
-- `produce_to_topic.ProduceToTopicOperator` - an operator that uses a iterable to produce messages as key/value pairs to a kafka topic. 
+- `consume_from_topic.ConsumeFromTopicOperator` - an operator that reads from a topic and applies a function to each message fetched.
+- `produce_to_topic.ProduceToTopicOperator` - an operator that uses a iterable to produce messages as key/value pairs to a kafka topic.
 - `event_triggers_function.EventTriggersFunctionOperator` - an operator that listens for messages on the topic and then triggers a downstream function before going back to listening.
 
-1 trigger `airflow_provider_kafka.triggers` : 
+1 trigger `airflow_provider_kafka.triggers` :
 - `await_message.AwaitMessageTrigger`
 
 
 ## Quick start
 
-` pip install airflow-provider-kafka` 
+` pip install airflow-provider-kafka`
 
-Example usages : 
+Example usages :
 - [basic read/write/sense on a topic](example_dags/listener_dag_function.py)
 - [event listener pattern](example_dags/listener_dag_function.py)
 
-## FAQs 
+## FAQs
 
-**Why confluent kafka and not (other library) ?** A few reasons: the [confluent-kafka](https://github.com/confluentinc/confluent-kafka-python) library is guaranteed to be 1:1 functional with librdkafka, is faster, and is maintained by a company with a commercial stake in ensuring the continued quality and upkeep of it as a product. 
+**Why confluent kafka and not (other library) ?** A few reasons: the [confluent-kafka](https://github.com/confluentinc/confluent-kafka-python) library is guaranteed to be 1:1 functional with librdkafka, is faster, and is maintained by a company with a commercial stake in ensuring the continued quality and upkeep of it as a product.
 
-**Why not release this into airflow directly ?** I could probably make the PR and get it through, but the airflow code base is getting huge and I don't want to burden the maintainers with code that they don't own for maintainence. Also there's been multiple attempts to get a Kafka provider in before and this is just faster. 
+**Why not release this into airflow directly ?** I could probably make the PR and get it through, but the airflow code base is getting huge and I don't want to burden the maintainers with code that they don't own for  maintenance. Also there's been multiple attempts to get a Kafka provider in before and this is just faster.
 
-**Why is most of the configuration handled in a dict ?** Because that's how `confluent-kafka` does it. I'd rather maintain interfaces that people already using kafka are comfortable with as a starting point - I'm happy to add more options/ interfaces in later but would prefer to be thoughtful about it to ensure that there difference between these operators and the actual client interface are minimal. 
+**Why is most of the configuration handled in a dict ?** Because that's how `confluent-kafka` does it. I'd rather maintain interfaces that people already using kafka are comfortable with as a starting point - I'm happy to add more options/ interfaces in later but would prefer to be thoughtful about it to ensure that there difference between these operators and the actual client interface are minimal.
+
+**How performant is this ?** Look we're not replacing native consumer/producer applications with this - but if you have some light/medium weight batch processes you need to run against a Kafka cluster, this should get you started while you figure out if you need to scale up into something
 
 ## Local Development
 

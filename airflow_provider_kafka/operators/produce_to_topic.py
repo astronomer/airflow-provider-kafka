@@ -60,8 +60,8 @@ class ProduceToTopicOperator(BaseOperator):
 
     def __init__(
         self,
-        topic: str = None,
-        producer_function: Union[str, Callable[..., Any]] = None,
+        topic: str,
+        producer_function: Union[str, Callable[..., Any]],
         producer_function_args: Optional[Sequence[Any]] = None,
         producer_function_kwargs: Optional[Dict[Any, Any]] = None,
         delivery_callback: Optional[str] = None,
