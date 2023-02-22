@@ -23,6 +23,7 @@ jobs:
     strategy:
       fail-fast: true
       matrix:
+        os: [ubuntu-latest, windows-latest, macos-latest]
         python-version:
           - "3.7"
           - "3.8"
@@ -45,15 +46,6 @@ jobs:
   mypy:
     name: mypy on ${{ matrix.python-version }}
     runs-on: ubuntu-latest
-    strategy:
-      fail-fast: false
-      matrix:
-        python-version:
-          - "3.7"
-          - "3.8"
-          - "3.9"
-          - "3.10"
-          - "3.11"
     steps:
       - uses: actions/checkout@v3
       - uses: actions/setup-python@v4
@@ -78,5 +70,5 @@ jobs:
           python-version: ${{env.PYTHON_LATEST}}
       - name: install and test import
         run: |
-          python -m pip install -e .
+          python -m pip install .
           python -c 'import airflow_provider_kafka; print(airflow_provider_kafka.__version__)'
