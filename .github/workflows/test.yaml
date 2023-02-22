@@ -18,7 +18,7 @@ env:
 
 jobs:
   tests:
-    name: tests on ${{ matrix.python-version }}
+    name: tests on ${{ matrix.python-version }} ${{ matrix.os }}
     runs-on: ubuntu-latest
     strategy:
       fail-fast: true
@@ -44,7 +44,7 @@ jobs:
           angreal dev-setup
           angreal run-tests
   mypy:
-    name: mypy on ${{ matrix.python-version }}
+    name: mypy
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v3
