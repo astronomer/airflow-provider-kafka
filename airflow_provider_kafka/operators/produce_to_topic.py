@@ -117,7 +117,7 @@ class ProduceToTopicOperator(BaseOperator):
         # For each returned k/v in the callable : publish and flush if needed.
         for k, v in producer_callable():
             producer.produce(
-                self.topic, key=k, value=v, on_delivery=self.delivery_callback
+                self.topic, key=k, value=v, headers=self.producer_function_kwargs.get('headers'), on_delivery=self.delivery_callback
             )
             producer.poll(self.poll_timeout)
             if self.synchronous:
