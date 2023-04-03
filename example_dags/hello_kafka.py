@@ -72,7 +72,7 @@ with DAG(
         task_id="produce_to_topic",
         topic="test_1",
         producer_function="hello_kafka.producer_function",
-        kafka_config={"bootstrap.servers": "broker:29092"},
+        kafka_config={"bootstrap.servers": "kafka:29092"},
     )
 
     t1.doc_md = "Takes a series of messages from a generator function and publishes them to the `test_1` topic of our kafka cluster."
@@ -83,7 +83,7 @@ with DAG(
         apply_function="hello_kafka.consumer_function",
         apply_function_kwargs={"prefix": "consumed:::"},
         consumer_config={
-            "bootstrap.servers": "broker:29092",
+            "bootstrap.servers": "kafka:29092",
             "group.id": "foo",
             "enable.auto.commit": False,
             "auto.offset.reset": "beginning",
@@ -99,7 +99,7 @@ with DAG(
         task_id="produce_to_topic_2",
         topic="test_1",
         producer_function=producer_function,
-        kafka_config={"bootstrap.servers": "broker:29092"},
+        kafka_config={"bootstrap.servers": "kafka:29092"},
     )
 
     t3.doc_md = "Does the same thing as the t1 task, but passes the callable directly instead of using the string notation."
@@ -109,7 +109,7 @@ with DAG(
         topics=["test_1"],
         apply_function=functools.partial(consumer_function, prefix="consumed:::"),
         consumer_config={
-            "bootstrap.servers": "broker:29092",
+            "bootstrap.servers": "kafka:29092",
             "group.id": "foo",
             "enable.auto.commit": False,
             "auto.offset.reset": "beginning",
@@ -126,7 +126,7 @@ with DAG(
             consumer_function_batch, prefix="consumed:::"
         ),
         consumer_config={
-            "bootstrap.servers": "broker:29092",
+            "bootstrap.servers": "kafka:29092",
             "group.id": "foo2",
             "enable.auto.commit": False,
             "auto.offset.reset": "beginning",
@@ -143,7 +143,7 @@ with DAG(
         topics=["test_1"],
         apply_function="hello_kafka.await_function",
         kafka_config={
-            "bootstrap.servers": "broker:29092",
+            "bootstrap.servers": "kafka:29092",
             "group.id": "awaiting_message",
             "enable.auto.commit": False,
             "auto.offset.reset": "beginning",

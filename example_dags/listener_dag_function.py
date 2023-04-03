@@ -43,7 +43,7 @@ with DAG(
         else:
             if message % 3 == 0:
                 print(f"encountered {message} FIZZ !")
-            if message & 5 == 0:
+            if message % 5 == 0:
                 print(f"encountered {message} BUZZ !")
 
     listen_for_message = EventTriggersFunctionOperator(
@@ -51,12 +51,13 @@ with DAG(
         topics=["test_1"],
         apply_function="listener_dag_function.await_function",  # this needs to be passed in as a module, function direct does not work!!!!
         kafka_config={
-            "bootstrap.servers": "broker:29092",
+            "bootstrap.servers": "kafka:29092",
             "group.id": "fizz_buzz",
             "enable.auto.commit": False,
             "auto.offset.reset": "beginning",
         },
         event_triggered_function=pick_downstream_dag,
+        poll_interval = 0.05
     )
 
 with DAG(
