@@ -1,5 +1,11 @@
 # Kafka Airflow Provider
 
+
+> **Warning**
+> This package has been deprecated after being accepted to OSS Airflow. Please use apache-airflow[apache.kafka] instead if you're looking for a supported kafka provider. 
+
+
+
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/astronomer/airflow-provider-kafka)![PyPI](https://img.shields.io/pypi/v/airflow-provider-kafka)![PyPI - Downloads](https://img.shields.io/pypi/dm/airflow-provider-kafka)
 
 
