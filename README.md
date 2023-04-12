@@ -2,6 +2,7 @@
 
 
 > **Warning**
+
 > This package has been deprecated after being accepted to OSS Airflow. Please use apache-airflow[apache.kafka] instead if you're looking for a supported kafka provider. 
 
 
