@@ -1,11 +1,14 @@
+## ⚠️ Discontinuation of project
+> Astronomer [donated](https://github.com/apache/airflow/pull/30175) [this provider](https://github.com/astronomer/airflow-provider-kafka) to the official Apache Airflow repository in March 2023. Since then, the original Astronomer repository and its PyPI package have been discontinued. For more information on the new Kafka package:
+> * PyPI package: [apache-airflow-providers-apache-kafka](https://pypi.org/project/apache-airflow-providers-apache-kafka/) 
+> * Documentation: [Apache Airflow Kafka official documentation](https://airflow.apache.org/docs/apache-airflow-providers-apache-kafka/stable/index.html)
+> * Source code: [Apache Airflow Kafka provider source code](https://github.com/apache/airflow/tree/main/providers/apache/kafka)
+>
+> Please note that the code available in [the original repository](https://github.com/astronomer/airflow-provider-kafka) may not work with the latest dependencies or platforms, and it could contain security vulnerabilities. Astronomer can’t offer guarantees or warranties for its use.
+> Thanks for being part of the open-source journey and helping keep great ideas alive!
+
+
 # Kafka Airflow Provider
-
-
-> **Warning**
-
-> This package has been deprecated after being accepted to OSS Airflow. Please use apache-airflow[apache.kafka] instead if you're looking for a supported kafka provider. 
-
-
 
 ![GitHub release (latest by date)](https://img.shields.io/github/v/release/astronomer/airflow-provider-kafka)![PyPI](https://img.shields.io/pypi/v/airflow-provider-kafka)![PyPI - Downloads](https://img.shields.io/pypi/dm/airflow-provider-kafka)
 
