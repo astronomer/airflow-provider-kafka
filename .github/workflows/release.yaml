@@ -1,11 +1,14 @@
 name: Release
-on: push
+on:
+  release:
+    types: ["published"]
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref_name }}-${{ github.event.pull_request.number || github.sha }}
   cancel-in-progress: true
 
 jobs:
   build-and-publish:
+    if: github.event_name == 'release'
     name: Build and publish Python 🐍 distributions 📦 to PyPI
     runs-on: ubuntu-latest
 
