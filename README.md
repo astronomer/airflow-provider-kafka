@@ -1,5 +1,8 @@
 ## ⚠️ Discontinuation of project
-> This project is no longer actively maintained by Astronomer, but we’d love to see it live on in the community. While Astronomer has paused development and is not accepting new contributions, bug fixes or releases, the code is still here for you to explore, fork and adapt under the terms of its license. 
+> Astronomer [donated this provider](https://github.com/apache/airflow/pull/30175) to the official Apache Airflow repository in March 2023. Since then, the original Astronomer repository and its PyPI package are no longer maintained. For more information on the new Kafka package:
+> * PyPI package: [apache-airflow-providers-apache-kafka](https://pypi.org/project/apache-airflow-providers-apache-kafka/) 
+> * Documentation: [Apache Airflow Kafka official documentation](https://airflow.apache.org/docs/apache-airflow-providers-apache-kafka/stable/index.html)
+> * Source code: [Apache Airflow Kafka provider source code](https://github.com/apache/airflow/tree/main/providers/apache/kafka)
 > Please note that it may not work with the latest dependencies or platforms, and it could contain security vulnerabilities. Astronomer can’t offer guarantees or warranties for its use.
 > If you’re interested in adopting or stewarding this project, we’d be happy to chat, reach us at oss@astronomer.io. Thanks for being part of the open-source journey and helping keep great ideas alive!
 
